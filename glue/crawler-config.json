@@ -1,0 +1,23 @@
+{
+  "_comentario": "Input de ejemplo para 'aws glue create-crawler'. Sustituir <bucket-maghsa-dwh> y el Role ARN reales antes de ejecutar.",
+  "Name": "crawler-maghsa-compras-analytics",
+  "Role": "arn:aws:iam::<account-id>:role/AWSGlueServiceRole-MAGHSA",
+  "DatabaseName": "compras_dwh",
+  "Description": "Crawler sobre la zona analytics/ del data lake de compras de MAGHSA",
+  "Targets": {
+    "S3Targets": [
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/hechos_compras/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_proveedor/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_producto/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_categoria/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_tiempo/" }
+    ]
+  },
+  "SchemaChangePolicy": {
+    "UpdateBehavior": "UPDATE_IN_DATABASE",
+    "DeleteBehavior": "LOG"
+  },
+  "RecrawlPolicy": {
+    "RecrawlBehavior": "CRAWL_EVERYTHING"
+  }
+}

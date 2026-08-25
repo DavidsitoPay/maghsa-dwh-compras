@@ -1,0 +1,7 @@
+categoria_id,nombre_categoria,familia_gasto
+CAT01,Repuestos de motor,Mantenimiento
+CAT02,Aceites y lubricantes,Mantenimiento
+CAT03,Neumaticos agricolas,Mantenimiento
+CAT04,Materia prima metalica,Produccion
+CAT05,Servicios de maquinado,Produccion
+CAT06,Combustibles,Operacion

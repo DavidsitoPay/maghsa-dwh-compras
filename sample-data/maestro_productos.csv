@@ -1,0 +1,7 @@
+producto_id,nombre,categoria_id,unidad_medida,descripcion
+PROD001,Filtro de aceite hidraulico,CAT01,unidad,Filtro para sistema hidraulico de tractores
+PROD002,Aceite hidraulico ISO 68,CAT02,galon,Lubricante para sistemas hidraulicos
+PROD003,Llanta agricola 18.4-30,CAT03,unidad,Neumatico trasero para tractor agricola
+PROD004,Lamina de acero A36,CAT04,unidad,Lamina para fabricacion de implementos
+PROD005,Servicio de torneado CNC,CAT05,servicio,Maquinado de piezas metalicas
+PROD006,Diesel B10,CAT06,galon,Combustible para maquinaria agroindustrial

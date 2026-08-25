@@ -1,0 +1,7 @@
+proveedor_id,nombre,categoria_proveedor,pais,localizacion,condiciones_pago,estado
+PRV001,Repuestos Agroindustriales del Norte,Repuestos,Guatemala,Quetzaltenango,30 dias,vigente
+PRV002,Aceros y Maquinaria S.A.,Materia Prima,Guatemala,Guatemala,60 dias,vigente
+PRV003,Importadora Diesel Centroamericana,Repuestos,Guatemala,Escuintla,contado,vigente
+PRV004,Lubricantes Industriales GT,Insumos,Guatemala,Guatemala,30 dias,vigente
+PRV005,Servicios Metalmecanicos del Sur,Servicios,Guatemala,Retalhuleu,45 dias,vigente
+PRV006,Distribuidora de Llantas Agricolas,Repuestos,Guatemala,Guatemala,30 dias,inactivo
