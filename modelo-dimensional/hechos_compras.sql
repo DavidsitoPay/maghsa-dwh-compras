@@ -10,7 +10,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS compras_dwh.hechos_compras (
     proveedor_id        STRING,   -- FK -> dim_proveedor.proveedor_id
     producto_id          STRING,   -- FK -> dim_producto.producto_id
     categoria_id        STRING,   -- FK -> dim_categoria.categoria_id
-    unidad_organizacional STRING,
+    unidad_organizacional_id STRING,   -- FK -> dim_unidad_organizacional.unidad_organizacional_id
     cantidad            DOUBLE,
     precio_unitario     DOUBLE,
     monto_total         DOUBLE,

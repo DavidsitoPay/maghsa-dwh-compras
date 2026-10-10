@@ -10,21 +10,46 @@ s3://<bucket-maghsa-dwh>/
 │   │   └── anio=2026/mes=08/registro_compras.csv
 │   ├── proveedores/maestro_proveedores.csv
 │   ├── productos/maestro_productos.csv
-│   └── categorias/catalogo_categorias.csv
+│   ├── categorias/catalogo_categorias.csv
+│   ├── categorias_proveedor/categorias_proveedor.csv
+│   ├── unidades_organizacionales/unidades_organizacionales.csv
+│   ├── proveedor_categoria_proveedor/proveedor_categoria_proveedor.csv
+│   ├── categoria_proveedor_x_categoria_producto/categoria_proveedor_x_categoria_producto.csv
+│   ├── proveedor_categoria_producto/proveedor_categoria_producto.csv
+│   ├── proveedor_x_producto/proveedor_x_producto.csv
+│   └── contacto_proveedor/contacto_proveedor.csv
 │
 ├── curated/                      # Datos validados/depurados, aún desnormalizados
 │   ├── compras/anio=2026/mes=08/*.parquet
 │   ├── proveedores/*.parquet
 │   ├── productos/*.parquet
-│   └── categorias/*.parquet
+│   ├── categorias/*.parquet
+│   ├── categorias_proveedor/*.parquet
+│   ├── unidades_organizacionales/*.parquet
+│   ├── proveedor_categoria_proveedor/*.parquet
+│   ├── categoria_proveedor_x_categoria_producto/*.parquet
+│   ├── proveedor_categoria_producto/*.parquet
+│   ├── proveedor_x_producto/*.parquet
+│   └── contacto_proveedor/*.parquet
 │
 └── analytics/                    # Modelo dimensional listo para consumo (Athena / Power BI)
     ├── hechos_compras/anio=2026/mes=08/*.parquet
     ├── dim_proveedor/*.parquet
     ├── dim_producto/*.parquet
     ├── dim_categoria/*.parquet
-    └── dim_tiempo/*.parquet
+    ├── dim_tiempo/*.parquet
+    ├── dim_categoria_proveedor/*.parquet
+    ├── dim_unidad_organizacional/*.parquet
+    ├── puente_proveedor_categoria_proveedor/*.parquet
+    ├── categoria_proveedor_x_categoria_producto/*.parquet
+    ├── puente_proveedor_categoria_producto/*.parquet
+    ├── puente_proveedor_producto/*.parquet
+    └── dim_contacto_proveedor/*.parquet
 ```
+
+Las tablas `puente_*` y `categoria_proveedor_x_categoria_producto` son relaciones N:M o de
+regla de negocio, no dimensiones tradicionales — ver `/modelo-dimensional/README.md` para el
+detalle de por qué existen separadas de `dim_proveedor`.
 
 ## Criterios de diseño
 

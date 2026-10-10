@@ -10,7 +10,14 @@
       { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_proveedor/" },
       { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_producto/" },
       { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_categoria/" },
-      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_tiempo/" }
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_tiempo/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_categoria_proveedor/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_unidad_organizacional/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/dim_contacto_proveedor/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/puente_proveedor_categoria_proveedor/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/puente_proveedor_categoria_producto/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/puente_proveedor_producto/" },
+      { "Path": "s3://<bucket-maghsa-dwh>/analytics/categoria_proveedor_x_categoria_producto/" }
     ]
   },
   "SchemaChangePolicy": {

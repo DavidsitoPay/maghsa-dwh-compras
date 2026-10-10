@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MAGHSA · Captura de compras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDF2F4;
+    --panel: #FFFFFF;
+    --ink: #17262D;
+    --steel: #55707C;
+    --steel-soft: #7C939C;
+    --line: #CBD8DC;
+    --line-soft: #DEE7EA;
+    --amber: #C77A1F;
+    --amber-deep: #9E5F14;
+    --amber-tint: #FBEDDB;
+    --ok-bg: #E4F1E8; --ok-ink: #2B6B45; --ok-line: #B9DCC4;
+    --err-bg: #FBEAE7; --err-ink: #A23428; --err-line: #F0C4BC;
+    --radius: 10px;
+    font-family: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  header.top {
+    margin-bottom: 32px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--steel);
+    letter-spacing: 0.02em;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 6px 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    color: var(--steel);
+    font-size: 14.5px;
+    margin: 0;
+    max-width: 52ch;
+  }
+  .subtitle code {
+    background: var(--line-soft);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+  }
+
+  /* ---------- Stepper ---------- */
+  .step {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 22px 24px;
+    margin-bottom: 18px;
+  }
+
+  .step-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .step-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--amber-deep);
+    background: var(--amber-tint);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transform: translateY(1px);
+  }
+  .step-title {
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .step-desc {
+    color: var(--steel);
+    font-size: 13.5px;
+    margin: 4px 0 18px 36px;
+  }
+  .step-body { margin-left: 36px; }
+
+  /* ---------- Fields ---------- */
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field label.field-label {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .field-hint {
+    display: block;
+    font-weight: 400;
+    color: var(--steel-soft);
+    font-size: 12.5px;
+    margin-top: 2px;
+  }
+
+  input[type="text"], input[type="password"], input[type="number"],
+  input[type="date"], select {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--panel);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14.5px;
+    transition: border-color .12s ease;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px var(--amber-tint);
+  }
+  input[readonly] { background: var(--paper); color: var(--steel); }
+  input::placeholder { color: var(--steel-soft); }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } }
+
+  /* ---------- Selector de tarea (entidad/accion) ---------- */
+  .task-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 520px) { .task-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- Chips (checkboxes en cascada) ---------- */
+  .chip-field { margin-bottom: 18px; }
+  .chip-field:last-child { margin-bottom: 0; }
+  .chip-title {
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 3px;
+  }
+  .chip-rule {
+    font-size: 12.5px;
+    color: var(--steel);
+    margin-bottom: 9px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip-rule .arrow { color: var(--amber-deep); font-family: "IBM Plex Mono", monospace; }
+
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 38px;
+  }
+  .chip-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--panel);
+    font-size: 13.5px;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color .12s ease, background .12s ease;
+  }
+  .chip-group label:hover { border-color: var(--steel-soft); }
+  .chip-group input[type="checkbox"] {
+    width: 14px; height: 14px;
+    accent-color: var(--amber-deep);
+    margin: 0;
+  }
+  .chip-group label:has(input:checked) {
+    background: var(--amber-tint);
+    border-color: var(--amber);
+    color: var(--amber-deep);
+    font-weight: 500;
+  }
+  .chip-empty {
+    font-size: 13px;
+    color: var(--steel-soft);
+    font-style: italic;
+    padding: 8px 2px;
+  }
+
+  /* ---------- Botón principal ---------- */
+  .actions {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 0 4px;
+    background: linear-gradient(to top, var(--paper) 60%, transparent);
+  }
+  button.primary {
+    background: var(--amber-deep);
+    color: #fff;
+    border: none;
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-size: 14.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .12s ease;
+  }
+  button.primary:hover { background: #85500F; }
+  button.primary:active { transform: translateY(1px); }
+
+  button.secondary {
+    background: transparent;
+    color: var(--amber-deep);
+    border: 1px solid var(--amber-deep);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .12s ease;
+  }
+  button.secondary:hover { background: var(--amber-tint); }
+  button.secondary:disabled { opacity: .6; cursor: default; }
+
+  .acceso-estado {
+    margin: 12px 0 0;
+    font-size: 13px;
+    display: none;
+  }
+  .acceso-estado.error { display: block; color: var(--err-ink); }
+  .acceso-estado.ok { display: block; color: var(--ok-ink); }
+
+  /* ---------- Resultado ---------- */
+  #resultado {
+    margin-top: 4px;
+    padding: 14px 16px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    border: 1px solid transparent;
+    display: none;
+  }
+  #resultado.ok { display: block; background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-line); }
+  #resultado.error { display: block; background: var(--err-bg); color: var(--err-ink); border-color: var(--err-line); }
+
+  #tabla_vacio {
+    display: none;
+    margin-top: 10px;
+    padding: 16px;
+    border: 1px dashed var(--line);
+    border-radius: 9px;
+    background: var(--panel);
+    color: var(--steel);
+    font-size: 13.5px;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    background: var(--panel);
+  }
+  .table-wrap {
+    display: none;
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  th, td {
+    border-bottom: 1px solid var(--line-soft);
+    padding: 8px 12px;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  th {
+    background: var(--paper);
+    font-weight: 600;
+    color: var(--steel);
+    font-size: 11.5px;
+    text-transform: none;
+    position: sticky;
+    top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="top">
+    <span class="eyebrow"><span class="dot"></span>MAGHSA · Data Warehouse de compras</span>
+    <h1>Captura de datos de compras</h1>
+    <p class="subtitle">Ambiente de prueba. Cada registro se valida antes de guardarse en <code>raw/</code>; nada se escribe si falta un dato o si la combinación de proveedor y producto no es válida.</p>
+  </header>
+
+  <!-- PASO 1: Acceso -->
+  <section class="step">
+    <div class="step-head"><span class="step-num">1</span><span class="step-title">Acceso</span></div>
+    <p class="step-desc">Se necesita una sola vez por sesión.</p>
+    <div class="step-body">
+      <div class="field">
+        <label class="field-label" for="url_funcion">URL de la función<span class="field-hint">Lambda Function URL del ambiente de prueba</span></label>
+        <input type="text" id="url_funcion" value="https://ftmi7vxgsbrcmzdyc3ji267sfe0ndabx.lambda-url.us-east-1.on.aws/" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="codigo_acceso">Código de acceso</label>
+        <input type="password" id="codigo_acceso" placeholder="••••••••••" onkeydown="if(event.key==='Enter'){ingresar();}" />
+      </div>
+      <button class="secondary" id="btn_ingresar" type="button" onclick="ingresar()">Ingresar</button>
+      <p id="acceso_estado" class="acceso-estado"></p>
+    </div>
+  </section>
+
+  <div id="area_trabajo" style="display:none">
+
+  <!-- PASO 2: Qué hacer -->
+  <section class="step">
+    <div class="step-head"><span class="step-num">2</span><span class="step-title">¿Qué se desea hacer?</span></div>
+    <p class="step-desc">Elegir primero la entidad y luego la acción; los campos de abajo cambian según esto.</p>
+    <div class="step-body task-grid">
+      <div class="field">
+        <label class="field-label" for="entidad">Entidad</label>
+        <select id="entidad" onchange="cambiarEntidad()">
+          <option value="compras" selected>Compras</option>
+          <option value="proveedores">Proveedores</option>
+          <option value="productos">Productos</option>
+          <option value="categorias">Categorías de producto</option>
+          <option value="categorias_proveedor">Categorías de proveedor</option>
+          <option value="unidades_organizacionales">Unidades organizacionales</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label" for="accion">Acción</label>
+        <select id="accion" onchange="cambiarAccion()">
+          <option value="listar">Listar</option>
+          <option value="crear" selected>Crear</option>
+          <option value="actualizar">Actualizar</option>
+          <option value="eliminar">Eliminar</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASO 3: Datos -->
+  <section class="step" id="paso_datos">
+    <div class="step-head"><span class="step-num">3</span><span class="step-title">Datos del registro</span></div>
+    <p class="step-desc">Los campos marcados con ayuda se completan solos o se filtran automáticamente.</p>
+    <div class="step-body">
+
+      <!-- ===================== COMPRAS ===================== -->
+      <div id="campos_compras">
+        <div class="field" id="lbl_id_compra" style="display:none">
+          <label class="field-label">ID de compra a modificar/eliminar</label>
+          <input type="text" id="c_id_compra" placeholder="OC0011" />
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label">Fecha</label>
+            <input type="date" id="c_fecha" />
+          </div>
+          <div class="field">
+            <label class="field-label">Unidad organizacional</label>
+            <select id="c_unidad"></select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Proveedor</label>
+          <select id="c_proveedor" onchange="alCambiarProveedorEnCompra()"></select>
+        </div>
+        <div class="field">
+          <label class="field-label">Producto<span class="field-hint">Solo se muestran los productos que este proveedor tiene asociados</span></label>
+          <select id="c_producto" onchange="actualizarCategoriaDesdeProducto()"></select>
+        </div>
+        <div class="field">
+          <label class="field-label">Categoría<span class="field-hint">Se completa sola según el producto elegido</span></label>
+          <input type="text" id="c_categoria" readonly />
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label">Cantidad</label>
+            <input type="number" id="c_cantidad" min="0.01" step="0.01" />
+          </div>
+          <div class="field">
+            <label class="field-label">Precio unitario (GTQ)</label>
+            <input type="number" id="c_precio" min="0.01" step="0.01" />
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label">Condición de pago</label>
+            <input type="text" id="c_condicion" placeholder="30 días / contado" />
+          </div>
+          <div class="field">
+            <label class="field-label">Lead time (días)</label>
+            <input type="number" id="c_lead" min="0" step="1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== PROVEEDORES ===================== -->
+      <div id="campos_proveedor" style="display:none">
+        <div class="field" id="lbl_id_proveedor" style="display:none">
+          <label class="field-label">ID de proveedor a modificar/eliminar</label>
+          <input type="text" id="p_id" />
+        </div>
+        <div class="field">
+          <label class="field-label">Nombre</label>
+          <input type="text" id="p_nombre" />
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label">País</label>
+            <input type="text" id="p_pais" />
+          </div>
+          <div class="field">
+            <label class="field-label">Localización</label>
+            <input type="text" id="p_localizacion" />
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label">Condiciones de pago</label>
+            <input type="text" id="p_condiciones_pago" />
+          </div>
+          <div class="field">
+            <label class="field-label">Estado</label>
+            <select id="p_estado">
+              <option value="vigente">vigente</option>
+              <option value="inactivo">inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="chip-field">
+          <div class="chip-title">Categorías de proveedor</div>
+          <div class="chip-rule">Se puede marcar más de una — un proveedor puede vender de varios tipos.</div>
+          <div class="chip-group" id="p_categorias_proveedor"></div>
+        </div>
+
+        <div class="chip-field">
+          <div class="chip-title">Categorías de producto que suministra</div>
+          <div class="chip-rule"><span class="arrow">↳</span> Depende de lo marcado arriba: solo aparecen las categorías de producto válidas para esas categorías de proveedor.</div>
+          <div class="chip-group" id="p_categorias_producto"></div>
+        </div>
+
+        <div class="chip-field">
+          <div class="chip-title">Productos específicos que suministra</div>
+          <div class="chip-rule"><span class="arrow">↳</span> Depende de lo marcado arriba: define qué productos podrá elegir este proveedor al capturar una compra.</div>
+          <div class="chip-group" id="p_productos"></div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label class="field-label">Nombre de contacto</label>
+            <input type="text" id="p_contacto_nombre" />
+          </div>
+          <div class="field">
+            <label class="field-label">Teléfono(s)<span class="field-hint">Separados por coma si hay más de uno</span></label>
+            <input type="text" id="p_contacto_telefonos" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Correo(s)<span class="field-hint">Separados por coma si hay más de uno</span></label>
+          <input type="text" id="p_contacto_correos" />
+        </div>
+      </div>
+
+      <!-- ===================== PRODUCTOS ===================== -->
+      <div id="campos_producto" style="display:none">
+        <div class="field" id="lbl_id_producto" style="display:none">
+          <label class="field-label">ID de producto a modificar/eliminar</label>
+          <input type="text" id="pr_id" />
+        </div>
+        <div class="field">
+          <label class="field-label">Nombre</label>
+          <input type="text" id="pr_nombre" />
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label">Categoría</label>
+            <select id="pr_categoria"></select>
+          </div>
+          <div class="field">
+            <label class="field-label">Unidad de medida</label>
+            <input type="text" id="pr_unidad_medida" placeholder="unidad / galón / servicio" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Descripción</label>
+          <input type="text" id="pr_descripcion" />
+        </div>
+      </div>
+
+      <!-- ===================== CATEGORIAS (producto) ===================== -->
+      <div id="campos_categoria" style="display:none">
+        <div class="field" id="lbl_id_categoria" style="display:none">
+          <label class="field-label">ID de categoría a modificar/eliminar</label>
+          <input type="text" id="cat_id" />
+        </div>
+        <div class="field">
+          <label class="field-label">Nombre de categoría</label>
+          <input type="text" id="cat_nombre" />
+        </div>
+        <div class="field">
+          <label class="field-label">Familia de gasto</label>
+          <input type="text" id="cat_familia" placeholder="Mantenimiento / Producción / Operación" />
+        </div>
+      </div>
+
+      <!-- ===================== CATEGORIAS DE PROVEEDOR ===================== -->
+      <div id="campos_categoria_proveedor" style="display:none">
+        <div class="field" id="lbl_id_categoria_proveedor" style="display:none">
+          <label class="field-label">ID a modificar/eliminar</label>
+          <input type="text" id="catp_id" />
+        </div>
+        <div class="field">
+          <label class="field-label">Nombre</label>
+          <input type="text" id="catp_nombre" />
+        </div>
+        <div class="field">
+          <label class="field-label">Descripción</label>
+          <input type="text" id="catp_descripcion" />
+        </div>
+      </div>
+
+      <!-- ===================== UNIDADES ORGANIZACIONALES ===================== -->
+      <div id="campos_unidad" style="display:none">
+        <div class="field" id="lbl_id_unidad" style="display:none">
+          <label class="field-label">ID a modificar/eliminar</label>
+          <input type="text" id="uo_id" />
+        </div>
+        <div class="field">
+          <label class="field-label">Nombre</label>
+          <input type="text" id="uo_nombre" />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="primary" onclick="enviar()">Enviar</button>
+  </div>
+
+  <div id="resultado"></div>
+
+  <div class="table-wrap" id="tabla_wrap">
+    <table id="tabla_resultado">
+      <thead><tr id="tabla_encabezado"></tr></thead>
+      <tbody id="tabla_cuerpo"></tbody>
+    </table>
+  </div>
+  <p id="tabla_vacio">Sin registros. Cuando exista al menos uno, aparecerá en esta tabla.</p>
+
+  </div>
+
+</div>
+
+<script>
+// ---------- Cache en memoria ----------
+let cache = {
+  proveedores: [],
+  productos: [],
+  categorias: [],
+  categoriasProveedor: [],
+  unidadesOrganizacionales: [],
+  proveedorXProducto: [],
+  categoriaProveedorXCategoriaProducto: [],
+};
+
+// ---------- Columnas por entidad (para mostrar encabezado aunque no haya registros) ----------
+const COLUMNAS_TABLA = {
+  compras: ["id_compra","fecha","proveedor_id","producto_id","categoria_id","unidad_organizacional_id","cantidad","precio_unitario","moneda","condicion_pago","lead_time_dias"],
+  proveedores: ["proveedor_id","nombre","pais","localizacion","condiciones_pago","estado"],
+  productos: ["producto_id","nombre","categoria_id","unidad_medida","descripcion"],
+  categorias: ["categoria_id","nombre_categoria","familia_gasto"],
+  categorias_proveedor: ["categoria_proveedor_id","nombre","descripcion"],
+  unidades_organizacionales: ["unidad_organizacional_id","nombre"],
+};
+
+async function ingresar() {
+  const estado = document.getElementById("acceso_estado");
+  const boton = document.getElementById("btn_ingresar");
+  estado.className = "acceso-estado";
+  estado.textContent = "";
+
+  if (!codigoAcceso()) {
+    estado.className = "acceso-estado error";
+    estado.textContent = "Ingrese el código de acceso.";
+    return;
+  }
+
+  boton.disabled = true;
+  boton.textContent = "Verificando…";
+
+  const prueba = await llamar("unidades_organizacionales", "listar");
+
+  boton.disabled = false;
+  boton.textContent = "Ingresar";
+
+  if (!prueba.ok) {
+    estado.className = "acceso-estado error";
+    estado.textContent = (prueba.json.errores || ["No se pudo verificar el código de acceso."]).join(" ");
+    document.getElementById("area_trabajo").style.display = "none";
+    return;
+  }
+
+  estado.className = "acceso-estado ok";
+  estado.textContent = "Acceso confirmado.";
+  document.getElementById("area_trabajo").style.display = "block";
+  await cambiarEntidad();
+}
+
+function urlFuncion() { return document.getElementById("url_funcion").value.trim(); }
+function codigoAcceso() { return document.getElementById("codigo_acceso").value; }
+
+async function llamar(entidad, accion, datos) {
+  const resp = await fetch(urlFuncion(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ codigo_acceso: codigoAcceso(), entidad, accion, datos: datos || {} }),
+  });
+  const json = await resp.json();
+  return { ok: resp.ok, json };
+}
+
+async function cargarCacheBase() {
+  const [prov, prod, cat, catProv, uo, pxp, cpxcp] = await Promise.all([
+    llamar("proveedores", "listar"),
+    llamar("productos", "listar"),
+    llamar("categorias", "listar"),
+    llamar("categorias_proveedor", "listar"),
+    llamar("unidades_organizacionales", "listar"),
+    llamar("proveedor_x_producto", "listar"),
+    llamar("categoria_proveedor_x_categoria_producto", "listar"),
+  ]);
+  cache.proveedores = prov.ok ? prov.json.registros : [];
+  cache.productos = prod.ok ? prod.json.registros : [];
+  cache.categorias = cat.ok ? cat.json.registros : [];
+  cache.categoriasProveedor = catProv.ok ? catProv.json.registros : [];
+  cache.unidadesOrganizacionales = uo.ok ? uo.json.registros : [];
+  cache.proveedorXProducto = pxp.ok ? pxp.json.registros : [];
+  cache.categoriaProveedorXCategoriaProducto = cpxcp.ok ? cpxcp.json.registros : [];
+}
+
+// ---------- Mostrar/ocultar bloques segun entidad ----------
+const BLOQUES = {
+  compras: "campos_compras",
+  proveedores: "campos_proveedor",
+  productos: "campos_producto",
+  categorias: "campos_categoria",
+  categorias_proveedor: "campos_categoria_proveedor",
+  unidades_organizacionales: "campos_unidad",
+};
+
+async function cambiarEntidad() {
+  const entidad = document.getElementById("entidad").value;
+
+  document.getElementById("tabla_wrap").style.display = "none";
+  document.getElementById("tabla_vacio").style.display = "none";
+  document.getElementById("resultado").className = "";
+  document.getElementById("resultado").textContent = "";
+
+  Object.values(BLOQUES).forEach(id => document.getElementById(id).style.display = "none");
+  document.getElementById(BLOQUES[entidad]).style.display = "block";
+
+  await cargarCacheBase();
+
+  if (entidad === "compras") {
+    poblarSelect("c_proveedor", cache.proveedores, "proveedor_id", "nombre");
+    poblarSelect("c_unidad", cache.unidadesOrganizacionales, "unidad_organizacional_id", "nombre");
+    alCambiarProveedorEnCompra();
+  }
+  if (entidad === "proveedores") {
+    renderCheckboxesCategoriaProveedor();
+    renderCheckboxesCategoriaProducto();
+    renderCheckboxesProducto();
+  }
+  if (entidad === "productos") {
+    poblarSelect("pr_categoria", cache.categorias, "categoria_id", "nombre_categoria");
+  }
+  cambiarAccion();
+}
+
+function cambiarAccion() {
+  const accion = document.getElementById("accion").value;
+  document.getElementById("paso_datos").style.display = accion === "listar" ? "none" : "block";
+  const mostrarId = accion === "actualizar" || accion === "eliminar";
+  const ids = ["lbl_id_compra", "lbl_id_proveedor", "lbl_id_producto", "lbl_id_categoria",
+               "lbl_id_categoria_proveedor", "lbl_id_unidad"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = mostrarId ? "block" : "none";
+  });
+}
+
+function poblarSelect(idSelect, registros, campoValor, campoTexto) {
+  const sel = document.getElementById(idSelect);
+  sel.innerHTML = registros.map(r => `<option value="${r[campoValor]}">${r[campoTexto]}</option>`).join("");
+}
+
+// ---------- Compras: producto filtrado por proveedor ----------
+function alCambiarProveedorEnCompra() {
+  const proveedorId = document.getElementById("c_proveedor").value;
+  const productoIds = cache.proveedorXProducto
+    .filter(r => r.proveedor_id === proveedorId)
+    .map(r => r.producto_id);
+  const productosDelProveedor = cache.productos.filter(p => productoIds.includes(p.producto_id));
+  poblarSelect("c_producto", productosDelProveedor, "producto_id", "nombre");
+  actualizarCategoriaDesdeProducto();
+}
+
+function actualizarCategoriaDesdeProducto() {
+  const id = document.getElementById("c_producto").value;
+  const prod = cache.productos.find(p => p.producto_id === id);
+  const cat = prod ? cache.categorias.find(c => c.categoria_id === prod.categoria_id) : null;
+  document.getElementById("c_categoria").value = cat ? cat.nombre_categoria : "";
+}
+
+// ---------- Proveedores: checkboxes en cascada ----------
+function renderCheckboxesCategoriaProveedor() {
+  const cont = document.getElementById("p_categorias_proveedor");
+  cont.innerHTML = cache.categoriasProveedor.map(c => `
+    <label><input type="checkbox" class="chk-categoria-proveedor" value="${c.categoria_proveedor_id}"
+      onchange="renderCheckboxesCategoriaProducto()"> ${c.nombre}</label>
+  `).join("");
+}
+
+function categoriasProveedorMarcadas() {
+  return [...document.querySelectorAll(".chk-categoria-proveedor:checked")].map(el => el.value);
+}
+
+function renderCheckboxesCategoriaProducto() {
+  const marcadas = categoriasProveedorMarcadas();
+  const categoriasPermitidasIds = new Set(
+    cache.categoriaProveedorXCategoriaProducto
+      .filter(r => marcadas.includes(r.categoria_proveedor_id))
+      .map(r => r.categoria_id)
+  );
+  const categoriasPermitidas = cache.categorias.filter(c => categoriasPermitidasIds.has(c.categoria_id));
+
+  const cont = document.getElementById("p_categorias_producto");
+  if (categoriasPermitidas.length === 0) {
+    cont.innerHTML = '<span class="chip-empty">Marque una categoría de proveedor primero.</span>';
+  } else {
+    cont.innerHTML = categoriasPermitidas.map(c => `
+      <label><input type="checkbox" class="chk-categoria-producto" value="${c.categoria_id}"
+        onchange="renderCheckboxesProducto()"> ${c.nombre_categoria}</label>
+    `).join("");
+  }
+  renderCheckboxesProducto();
+}
+
+function categoriasProductoMarcadas() {
+  return [...document.querySelectorAll(".chk-categoria-producto:checked")].map(el => el.value);
+}
+
+function renderCheckboxesProducto() {
+  const marcadas = categoriasProductoMarcadas();
+  const productosPermitidos = cache.productos.filter(p => marcadas.includes(p.categoria_id));
+
+  const cont = document.getElementById("p_productos");
+  if (productosPermitidos.length === 0) {
+    cont.innerHTML = '<span class="chip-empty">Marque una categoría de producto primero.</span>';
+  } else {
+    cont.innerHTML = productosPermitidos.map(p => `
+      <label><input type="checkbox" class="chk-producto" value="${p.producto_id}"> ${p.nombre}</label>
+    `).join("");
+  }
+}
+
+function productosMarcados() {
+  return [...document.querySelectorAll(".chk-producto:checked")].map(el => el.value);
+}
+
+// ---------- Envio ----------
+function mostrarResultado(ok, accion, contenido) {
+  const div = document.getElementById("resultado");
+  if (ok && accion === "listar") { div.className = ""; div.textContent = ""; return; }
+  div.className = ok ? "ok" : "error";
+  div.textContent = ok
+    ? (contenido.mensaje || "Listo.")
+    : (contenido.errores || ["Ocurrió un error inesperado. Intente de nuevo."]).join(" ");
+}
+
+function mostrarTabla(entidad, registros) {
+  const envoltorio = document.getElementById("tabla_wrap");
+  const vacio = document.getElementById("tabla_vacio");
+  const encabezado = document.getElementById("tabla_encabezado");
+  const cuerpo = document.getElementById("tabla_cuerpo");
+  encabezado.innerHTML = "";
+  cuerpo.innerHTML = "";
+
+  const hayDatos = registros && registros.length > 0;
+  const columnas = hayDatos ? Object.keys(registros[0]) : (COLUMNAS_TABLA[entidad] || []);
+
+  if (columnas.length === 0) { envoltorio.style.display = "none"; vacio.style.display = "none"; return; }
+
+  columnas.forEach(c => { const th = document.createElement("th"); th.textContent = c; encabezado.appendChild(th); });
+
+  if (hayDatos) {
+    registros.forEach(r => {
+      const tr = document.createElement("tr");
+      columnas.forEach(c => { const td = document.createElement("td"); td.textContent = r[c]; tr.appendChild(td); });
+      cuerpo.appendChild(tr);
+    });
+  }
+
+  envoltorio.style.display = "block";
+  vacio.style.display = hayDatos ? "none" : "block";
+}
+
+async function enviar() {
+  const entidad = document.getElementById("entidad").value;
+  const accion = document.getElementById("accion").value;
+  let datos = {};
+
+  if (entidad === "compras") {
+    datos = {
+      id_compra: document.getElementById("c_id_compra").value,
+      fecha: document.getElementById("c_fecha").value,
+      proveedor_id: document.getElementById("c_proveedor").value,
+      producto_id: document.getElementById("c_producto").value,
+      categoria_id: (cache.productos.find(p => p.producto_id === document.getElementById("c_producto").value) || {}).categoria_id || "",
+      unidad_organizacional_id: document.getElementById("c_unidad").value,
+      cantidad: document.getElementById("c_cantidad").value,
+      precio_unitario: document.getElementById("c_precio").value,
+      condicion_pago: document.getElementById("c_condicion").value,
+      lead_time_dias: document.getElementById("c_lead").value,
+    };
+  } else if (entidad === "proveedores") {
+    datos = {
+      proveedor_id: document.getElementById("p_id").value,
+      nombre: document.getElementById("p_nombre").value,
+      pais: document.getElementById("p_pais").value,
+      localizacion: document.getElementById("p_localizacion").value,
+      condiciones_pago: document.getElementById("p_condiciones_pago").value,
+      estado: document.getElementById("p_estado").value,
+      categorias_proveedor_ids: categoriasProveedorMarcadas(),
+      categorias_producto_ids: categoriasProductoMarcadas(),
+      producto_ids: productosMarcados(),
+      nombre_contacto: document.getElementById("p_contacto_nombre").value,
+      telefonos: document.getElementById("p_contacto_telefonos").value,
+      correos: document.getElementById("p_contacto_correos").value,
+    };
+  } else if (entidad === "productos") {
+    datos = {
+      producto_id: document.getElementById("pr_id").value,
+      nombre: document.getElementById("pr_nombre").value,
+      categoria_id: document.getElementById("pr_categoria").value,
+      unidad_medida: document.getElementById("pr_unidad_medida").value,
+      descripcion: document.getElementById("pr_descripcion").value,
+    };
+  } else if (entidad === "categorias") {
+    datos = {
+      categoria_id: document.getElementById("cat_id").value,
+      nombre_categoria: document.getElementById("cat_nombre").value,
+      familia_gasto: document.getElementById("cat_familia").value,
+    };
+  } else if (entidad === "categorias_proveedor") {
+    datos = {
+      categoria_proveedor_id: document.getElementById("catp_id").value,
+      nombre: document.getElementById("catp_nombre").value,
+      descripcion: document.getElementById("catp_descripcion").value,
+    };
+  } else if (entidad === "unidades_organizacionales") {
+    datos = {
+      unidad_organizacional_id: document.getElementById("uo_id").value,
+      nombre: document.getElementById("uo_nombre").value,
+    };
+  }
+
+  const { ok, json } = await llamar(entidad, accion, datos);
+  mostrarResultado(ok, accion, json);
+  if (ok && accion === "listar") {
+    mostrarTabla(entidad, json.registros);
+  } else {
+    document.getElementById("tabla_wrap").style.display = "none";
+    document.getElementById("tabla_vacio").style.display = "none";
+  }
+}
+</script>
+
+</body>
+</html>

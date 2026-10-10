@@ -1,0 +1,6 @@
+categoria_proveedor_id,nombre,descripcion
+CATPROV01,Repuestos,Proveedores de repuestos y refacciones para maquinaria agroindustrial
+CATPROV02,Materia Prima,Proveedores de materia prima metalica y materiales de produccion
+CATPROV03,Servicios,Proveedores de servicios tecnicos y de maquinado
+CATPROV04,Insumos,Proveedores de insumos de mantenimiento como aceites y lubricantes
+CATPROV05,Combustibles,Proveedores de combustibles y derivados
