@@ -1,5 +1,5 @@
 {
-  "_comentario": "Input de ejemplo para 'aws glue create-crawler'. Sustituir <bucket-maghsa-dwh> y el Role ARN reales antes de ejecutar.",
+  "_comentario": "Input para 'aws glue create-crawler'. Crawler on demand (sin Schedule): se ejecuta manualmente con 'aws glue start-crawler'. Sustituir <bucket-maghsa-dwh> y <account-id> antes de ejecutar. El rol AWSGlueServiceRole-MAGHSA usa la politica administrada AWSGlueServiceRole mas lectura (s3:GetObject, s3:ListBucket) sobre analytics/.",
   "Name": "crawler-maghsa-compras-analytics",
   "Role": "arn:aws:iam::<account-id>:role/AWSGlueServiceRole-MAGHSA",
   "DatabaseName": "compras_dwh",

@@ -9,10 +9,10 @@ gratuita de AWS).
 
 | Archivo | Contenido | Corresponde a |
 |---|---|---|
-| `maestro_proveedores.csv` | 6 proveedores de ejemplo (sin categoría embebida — ver normalización abajo) | `dim_proveedor` |
-| `maestro_productos.csv` | 6 productos de ejemplo | `dim_producto` |
+| `maestro_proveedores.csv` | 8 proveedores de ejemplo (sin categoría embebida — ver normalización abajo) | `dim_proveedor` |
+| `maestro_productos.csv` | 11 productos de ejemplo | `dim_producto` |
 | `catalogo_categorias.csv` | 6 categorías de producto de ejemplo | `dim_categoria` |
-| `registro_compras.csv` | 10 órdenes de compra de ejemplo (`unidad_organizacional_id`, ya no texto libre) | `hechos_compras` (falta `fecha_id` y `monto_total`, derivables en la carga) |
+| `registro_compras.csv` | 97 órdenes de compra de ejemplo (enero–octubre 2026, generadas con `scripts/generar_datos_dummy.py`) (`unidad_organizacional_id`, ya no texto libre) | `hechos_compras` (falta `fecha_id` y `monto_total`, derivables en la carga) |
 
 ## Catálogos y relaciones normalizadas (proveedor ↔ categorías ↔ productos)
 
@@ -38,7 +38,5 @@ eso en una tabla aparte no aportaría valor proporcional al esfuerzo.
 ## Siguiente paso para cargar
 
 1. Subir estos CSV a `raw/` en S3 respetando la estructura de `/s3-structure/README.md`.
-2. Convertir a Parquet y calcular columnas derivadas (`fecha_id`, `monto_total = cantidad *
-   precio_unitario`) antes de moverlos a `curated/`/`analytics/` — se hace con
-   `scripts/transformar_a_parquet.py`.
-3. Generar `dim_tiempo` para el rango de fechas usado (junio–agosto 2026).
+2. Cargar `curated/` y `analytics/` con las sentencias de `athena/etl/` (orden en `athena/etl/README.md`):
+   derivan `fecha_id` y `monto_total` y generan `dim_tiempo` desde la primera fecha de compra hasta hoy.

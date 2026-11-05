@@ -5,3 +5,8 @@ PROD003,Llanta agricola 18.4-30,CAT03,unidad,Neumatico trasero para tractor agri
 PROD004,Lamina de acero A36,CAT04,unidad,Lamina para fabricacion de implementos
 PROD005,Servicio de torneado CNC,CAT05,servicio,Maquinado de piezas metalicas
 PROD006,Diesel B10,CAT06,galon,Combustible para maquinaria agroindustrial
+PROD007,Filtro de aire de motor,CAT01,unidad,Filtro de aire para motor diesel de tractores
+PROD008,Aceite de motor 15W-40,CAT02,galon,Lubricante para motores diesel
+PROD009,Barra de acero redonda 1 pulgada,CAT04,unidad,Barra para fabricacion de ejes y piezas
+PROD010,Servicio de soldadura industrial,CAT05,servicio,Soldadura de estructuras y implementos
+PROD011,Gasolina super,CAT06,galon,Combustible para vehiculos livianos

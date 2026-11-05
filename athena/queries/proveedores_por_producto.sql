@@ -1,3 +1,4 @@
+-- KPI: Proveedores vigentes por producto (catálogo, consulta puntual). Proveedores que suministran un producto específico, para cotizar.
 -- Consulta de catálogo (no es un KPI de monto): ¿qué proveedores vigentes
 -- suministran un producto específico? Nivel de detalle más fino que la
 -- consulta por categoría — útil cuando ya se sabe exactamente qué producto

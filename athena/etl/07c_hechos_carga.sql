@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS tmp_a_hechos;
+DROP TABLE IF EXISTS tmp_c_compras;
+CREATE TABLE tmp_a_hechos WITH (format='PARQUET', parquet_compression='SNAPPY', external_location='s3://<bucket-maghsa-dwh>/analytics/hechos_compras/', partitioned_by=ARRAY['anio','mes']) AS SELECT id_compra, replace(fecha,'-','') AS fecha_id, proveedor_id, producto_id, categoria_id, unidad_organizacional_id, CAST(cantidad AS double) AS cantidad, CAST(precio_unitario AS double) AS precio_unitario, round(CAST(cantidad AS double)*CAST(precio_unitario AS double),2) AS monto_total, moneda, condicion_pago, CAST(NULLIF(trim(lead_time_dias),'') AS integer) AS lead_time_dias, anio, mes FROM tmp_v_compras;
+DROP TABLE tmp_a_hechos;
+CREATE TABLE tmp_c_compras WITH (format='PARQUET', parquet_compression='SNAPPY', external_location='s3://<bucket-maghsa-dwh>/curated/compras/', partitioned_by=ARRAY['anio','mes']) AS SELECT id_compra, fecha, proveedor_id, producto_id, categoria_id, unidad_organizacional_id, CAST(cantidad AS double) AS cantidad, CAST(precio_unitario AS double) AS precio_unitario, CAST(NULLIF(trim(lead_time_dias),'') AS integer) AS lead_time_dias, replace(fecha,'-','') AS fecha_id, round(CAST(cantidad AS double)*CAST(precio_unitario AS double),2) AS monto_total, anio, mes FROM tmp_v_compras;
+DROP TABLE tmp_c_compras;
+DROP VIEW tmp_v_compras;
+DROP TABLE tmp_csv_compras;
+DROP TABLE tmp_csv_compras_web;
+MSCK REPAIR TABLE hechos_compras;

@@ -38,3 +38,8 @@ sin agrupar explícitamente por proveedor primero.
   válidas para cada categoría de proveedor. Se usa para filtrar los checkboxes del formulario
   de ingesta (`lambda-captura/`), no para análisis. Se mantiene en `analytics/` solo por
   trazabilidad.
+
+## Vistas
+
+- `v_producto_proveedores_vigentes.sql` — productos del catálogo con su número de proveedores vigentes; base del KPI "% Productos con Proveedor Único" (no es dimensión ni hecho).
+- `v_alternativas_proveedor.sql` — una fila por proveedor autorizado y producto, con estado, condición de pago, compras acumuladas, precio y lead time promedio y su diferencia contra el proveedor principal (el de mayor gasto); base de la página "Alternativas de proveedor" (no es dimensión ni hecho).

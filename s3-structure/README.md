@@ -1,13 +1,19 @@
 # Organización lógica del almacenamiento en S3
 
-Se propone una organización por zonas (raw / curated / analytics), alineada al ciclo de
-madurez del dato descrito en el marco teórico del documento (arquitectura por capas).
+Organización por zonas (raw / curated / analytics), alineada al ciclo de madurez del dato
+descrito en el marco teórico del documento (arquitectura por capas).
+
+- `raw/` recibe los CSV de origen: la carga manual de `sample-data/` y lo que escribe el
+  formulario de captura (`lambda-captura/`).
+- `curated/` y `analytics/` los genera `athena/etl/` (CTAS desde `raw/`).
 
 ```
 s3://<bucket-maghsa-dwh>/
 ├── raw/                          # Datos originales, sin transformar (CSV tal cual llegan)
 │   ├── compras/
-│   │   └── anio=2026/mes=08/registro_compras.csv
+│   │   └── anio=AAAA/mes=MM/registro_compras.csv
+│   ├── compras_web/
+│   │   └── registro_compras_web.csv    # escrito por el formulario; sin anio=/mes=
 │   ├── proveedores/maestro_proveedores.csv
 │   ├── productos/maestro_productos.csv
 │   ├── categorias/catalogo_categorias.csv
@@ -20,7 +26,7 @@ s3://<bucket-maghsa-dwh>/
 │   └── contacto_proveedor/contacto_proveedor.csv
 │
 ├── curated/                      # Datos validados/depurados, aún desnormalizados
-│   ├── compras/anio=2026/mes=08/*.parquet
+│   ├── compras/anio=AAAA/mes=MM/*.parquet
 │   ├── proveedores/*.parquet
 │   ├── productos/*.parquet
 │   ├── categorias/*.parquet
@@ -32,8 +38,9 @@ s3://<bucket-maghsa-dwh>/
 │   ├── proveedor_x_producto/*.parquet
 │   └── contacto_proveedor/*.parquet
 │
+├── athena-results/              # Resultados de consultas Athena; expiran a los 30 días (regla de ciclo de vida)
 └── analytics/                    # Modelo dimensional listo para consumo (Athena / Power BI)
-    ├── hechos_compras/anio=2026/mes=08/*.parquet
+    ├── hechos_compras/anio=AAAA/mes=MM/*.parquet
     ├── dim_proveedor/*.parquet
     ├── dim_producto/*.parquet
     ├── dim_categoria/*.parquet
@@ -47,21 +54,31 @@ s3://<bucket-maghsa-dwh>/
     └── dim_contacto_proveedor/*.parquet
 ```
 
+`raw/compras/` guarda el histórico por partición `anio=`/`mes=`. `raw/compras_web/` guarda las
+compras capturadas por el formulario en un solo archivo (`OCW####`), fuera de esa jerarquía; la
+carga las une al histórico y las particiona por su `fecha`.
+
 Las tablas `puente_*` y `categoria_proveedor_x_categoria_producto` son relaciones N:M o de
 regla de negocio, no dimensiones tradicionales — ver `/modelo-dimensional/README.md` para el
 detalle de por qué existen separadas de `dim_proveedor`.
 
 ## Criterios de diseño
 
-- **Particionamiento:** `hechos_compras` se particiona por `anio`/`mes` para que Athena escanee
-  solo los datos relevantes por consulta y reduzca costo de procesamiento.
+- **Particionamiento:** `hechos_compras` y `curated/compras/` se particionan por `anio`/`mes`
+  (derivados de la fecha de la compra) para que Athena escanee solo los datos relevantes por
+  consulta y reduzca costo de procesamiento.
 - **Formato:** `raw/` se mantiene en CSV (formato de origen); `curated/` y `analytics/` migran a
   Parquet + compresión Snappy, más eficiente para consultas columnar en Athena.
-- **Nomenclatura:** prefijos en minúsculas, particiones estilo Hive (`anio=2026/mes=08/`) para que
-  el crawler y `MSCK REPAIR TABLE` las reconozcan automáticamente.
-- **Ciclo de vida:** se puede aplicar una política de lifecycle en `raw/` (ej. mover a S3
-  Infrequent Access después de 90 días) para mantener el costo bajo, aunque para el alcance
-  académico del proyecto no es indispensable en esta fase.
+- **Nomenclatura:** prefijos en minúsculas, particiones estilo Hive (`anio=AAAA/mes=MM/`) para que
+  el crawler y `MSCK REPAIR TABLE` las reconozcan automáticamente; la carga oficial ejecuta
+  `MSCK REPAIR TABLE hechos_compras` al terminar.
+- **Ciclo de vida:** la regla `expirar-athena-results-30d` (habilitada) hace expirar a los 30 días
+  los objetos bajo `athena-results/`, que guarda los resultados de consultas Athena: subprefijos
+  `powerbi/` (workgroup `maghsa-powerbi`), `etl/` y `tables/` (resultados de CTAS/ETL) y `tmp/`.
+  No hay reglas sobre `raw/`, `curated/` ni `analytics/`. Es una cuenta personal de pruebas con
+  objetivo de gasto ~0: no hay nada programado; el crawler `crawler-maghsa-compras-analytics` no
+  tiene schedule y se ejecuta a mano, y no hay triggers de Glue ni reglas de EventBridge o
+  EventBridge Scheduler.
 
 ## Bucket de prueba (capa gratuita)
 
