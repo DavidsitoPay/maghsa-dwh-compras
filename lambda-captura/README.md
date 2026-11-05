@@ -33,17 +33,29 @@ Dos buckets separados, a proposito:
 
 ## Que valida la Lambda antes de escribir
 
-- Que el proveedor y el producto elegidos existan en sus respectivos maestros.
-- Que el producto elegido este realmente asociado a ese proveedor (`proveedor_x_producto`) al
-  capturar una compra -- ya no basta con que el producto exista en el maestro.
-- Que la unidad organizacional elegida exista en el catalogo `unidades_organizacionales`.
-- Que la cantidad y el precio unitario sean mayores a cero.
-- Que la fecha no sea futura.
-- Al crear/editar un proveedor: que las categorias de producto marcadas sean compatibles con las
-  categorias de proveedor marcadas (`categoria_proveedor_x_categoria_producto`), y que los
-  productos marcados pertenezcan a esas categorias.
+- Entrada: el cuerpo es un objeto JSON de hasta 100 000 caracteres (se acepta `isBase64Encoded`); `entidad`, `accion` e identificadores son texto y `datos` es un objeto. Un cuerpo mal formado responde 400 con `errores[]`.
+- Acceso: `codigo_acceso` debe ser texto y coincidir con `ACCESS_CODE` (comparacion con `hmac.compare_digest`); si no, 403 generico. Si `ACCESS_CODE` esta vacio o no definido, ningun codigo autentica (401).
+- Texto de los maestros: campos obligatorios no vacios, longitud maxima por campo, sin saltos de linea ni caracteres de control, y sin iniciar con `=`, `@`, `+` o `-` (proteccion contra inyeccion de formulas en CSV). Los telefonos pueden iniciar con `+`.
+- Unicidad de nombre, sin distinguir mayusculas, en categorias, categorias de proveedor y unidades organizacionales.
+- Referencias: la categoria de un producto existe; en una compra existen el proveedor, el producto (asociado a ese proveedor en `proveedor_x_producto`), la categoria y la unidad organizacional.
+- Valores cerrados: `estado` de proveedor `vigente` o `inactivo`; `moneda` `GTQ`.
+- Condicion de pago: `contado` o `N dias` (1 a 3 digitos); se guarda normalizada (`30 días` queda `30 dias`).
+- Cantidad y precio unitario: decimales mayores a cero, sin notacion cientifica. Lead time (`lead_time_dias`): obligatorio, entero de 0 a 9999.
+- Fecha: fecha real `AAAA-MM-DD`, no futura según la fecha actual de Guatemala (UTC-6); cualquier fecha pasada es válida. Se guarda normalizada (`2026-1-5` queda `2026-01-05`).
+- Al actualizar, los campos no enviados conservan su valor y el registro resultante se valida con las mismas reglas.
+- Proveedores: al crear debe marcarse al menos una categoria de proveedor; las categorias de producto y los productos marcados existen, son compatibles con las categorias de proveedor (`categoria_proveedor_x_categoria_producto`) y los productos pertenecen a categorias marcadas.
 
 Si algo falla, no se escribe nada en S3 y se devuelve el detalle del error.
+
+## Respuestas
+
+- `200` / `201`: operacion aplicada (`201` al crear).
+- `400`: validacion o entrada invalida, con `errores[]`. No se escribe nada.
+- `401`: `ACCESS_CODE` no configurado en la Lambda; ningun codigo autentica.
+- `403`: codigo de acceso invalido o ausente; mensaje generico.
+- `404`: el identificador no existe.
+- `409`: eliminar un registro en uso, con `errores[]`. Proveedor o unidad con compras; producto con compras o relaciones proveedor-producto; categoria con productos, compras, categorias de producto de proveedores o reglas; categoria de proveedor con proveedores o reglas. No se borra nada.
+- `500`: `{"errores": ["Error interno del servidor."]}`, sin detalle; el detalle queda solo en el log de CloudWatch.
 
 ## Modelo de datos (v2 -- normalizado)
 
@@ -68,10 +80,7 @@ el formulario.
 `proveedor_categoria_proveedor`, `categoria_proveedor_x_categoria_producto`,
 `proveedor_categoria_producto`, `proveedor_x_producto`, `contacto_proveedor`.
 
-Las compras nuevas capturadas desde el formulario se acumulan en un archivo propio
-(`raw/compras/anio=2026/mes=09/registro_compras_web.csv`), separado del historico
-original usado en la validacion funcional de la entrega anterior, para no
-mezclarlos ni sobrescribirlos.
+Las compras nuevas capturadas desde el formulario se acumulan en un archivo propio (`raw/compras_web/registro_compras_web.csv`, fuera de la jerarquia `anio=/mes=`) con identificador `OCW` + 4 digitos (`OCW0001`), separado del historico `OC0001..OC0097`, para no mezclarlos ni sobrescribirlos.
 
 ## Seguridad de esta fase (cuenta personal / pruebas)
 
@@ -80,11 +89,24 @@ mezclarlos ni sobrescribirlos.
   Es intencionalmente minimo: el objetivo es evitar que alguien con el enlace
   borre o modifique datos por accidente, no sustituir un sistema de autenticacion.
 - El rol de IAM de la Lambda (`maghsa-captura-lambda-role`) tiene permisos
-  minimos: solo `s3:GetObject` y `s3:PutObject`, y solo sobre `raw/*` del bucket
-  de datos. No puede tocar `curated/`, `analytics/` ni ningun otro recurso.
+  minimos: `s3:GetObject` y `s3:PutObject` sobre `raw/*` del bucket de datos, y
+  `s3:ListBucket` limitado al prefijo `raw/*` (para comprobar referencias al eliminar).
+  No puede tocar `curated/`, `analytics/` ni ningun otro recurso.
 - El bucket del formulario (`maghsa-captura-web-070366844944`) es publico
   **unicamente para lectura** del archivo estatico; el bucket de datos sigue
   privado.
+- **Limitaciones conocidas:** no hay limite de intentos del codigo de acceso (la Function URL no lo ofrece; WAF agregaria costo y complejidad); escrituras simultaneas sobre el mismo CSV pueden perder una.
+
+## Pruebas
+
+Tests locales con pytest y un stub de boto3 en memoria (sin AWS ni red):
+
+```bash
+python -m pip install pytest
+python -m pytest lambda-captura/tests -q
+```
+
+El zip de despliegue incluye solo `lambda_function.py`, no `tests/`.
 
 ## Costo (capa gratuita, verificado)
 

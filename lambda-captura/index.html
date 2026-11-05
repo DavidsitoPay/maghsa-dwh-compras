@@ -395,7 +395,7 @@
       <div id="campos_compras">
         <div class="field" id="lbl_id_compra" style="display:none">
           <label class="field-label">ID de compra a modificar/eliminar</label>
-          <input type="text" id="c_id_compra" placeholder="OC0011" />
+          <input type="text" id="c_id_compra" placeholder="OCW0001" />
         </div>
         <div class="row2">
           <div class="field">
@@ -435,8 +435,8 @@
             <input type="text" id="c_condicion" placeholder="30 días / contado" />
           </div>
           <div class="field">
-            <label class="field-label">Lead time (días)</label>
-            <input type="number" id="c_lead" min="0" step="1" />
+            <label class="field-label" for="c_lead">Lead time (días)<span class="field-hint">Obligatorio, entero mayor o igual a 0</span></label>
+            <input type="number" id="c_lead" min="0" step="1" required />
           </div>
         </div>
       </div>
@@ -858,6 +858,9 @@ async function enviar() {
   const entidad = document.getElementById("entidad").value;
   const accion = document.getElementById("accion").value;
   let datos = {};
+
+  const guardaCompra = entidad === "compras" && (accion === "crear" || accion === "actualizar");
+  if (guardaCompra && !document.getElementById("c_lead").reportValidity()) return;
 
   if (entidad === "compras") {
     datos = {
