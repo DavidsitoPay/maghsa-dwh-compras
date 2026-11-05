@@ -12,7 +12,7 @@ Requisito previo: la base `compras_dwh` y las tablas externas de `modelo-dimensi
 |---|---|---|---|---|
 | 1 | `01`-`06` | Maestros y puentes: `dim_proveedor`, `dim_producto`, `dim_contacto_proveedor`, `puente_proveedor_categoria_proveedor`, `puente_proveedor_categoria_producto`, `puente_proveedor_producto` | `raw/` | CTAS |
 | 2 | `09`-`12` | Catálogos: `dim_categoria`, `dim_categoria_proveedor`, `dim_unidad_organizacional`, `categoria_proveedor_x_categoria_producto` | `raw/` | CTAS |
-| 3 | `07a_hechos_origen.sql` | Crea las tablas temporales sobre `raw/compras/` (todas las particiones) y `raw/compras_web/`, y la vista `tmp_v_compras` que las une; `anio`/`mes` de las compras web salen de `fecha`; las compras con fecha posterior a hoy no entran | `raw/` | Tablas y vista temporales |
+| 3 | `07a_hechos_origen.sql` | Crea las tablas temporales sobre `raw/compras/` (todas las particiones; ejecuta `MSCK REPAIR TABLE tmp_csv_compras`) y `raw/compras_web/`, y la vista `tmp_v_compras` que las une; `anio`/`mes` de las compras web salen de `fecha`; las compras con fecha posterior a hoy no entran | `raw/` | Tablas y vista temporales |
 | 4 | `07b_hechos_validacion.sql` | Valida el origen y los vínculos con `dim_proveedor`, `dim_producto`, `dim_categoria` y `dim_unidad_organizacional` | `tmp_v_compras` (paso 3), pasos 1 y 2 | Solo lectura |
 | 5 | `07c_hechos_carga.sql` | CTAS de `hechos_compras` y `curated/compras`, particionados por `anio`/`mes`; `lead_time_dias` vacío = NULL; borra las tablas temporales y cierra con `MSCK REPAIR TABLE hechos_compras` | `tmp_v_compras` (paso 3) | CTAS |
 | 6 | `08_dim_tiempo.sql` | `dim_tiempo` desde la primera fecha de `hechos_compras` hasta hoy (hora de Guatemala) | `hechos_compras` (paso 5) | CTAS |

@@ -35,7 +35,7 @@ de forma independiente sin afectar al resto de la solución.
 
 Dos entradas escriben en `raw/`: la carga manual de los CSV de origen y el **portal de captura**
 (una página HTML con una Lambda de Function URL), con el que el personal de compras registra
-datos sin acceso a la consola. Las compras capturadas quedan en `raw/compras_web/`. La carga
+datos sin acceso a la consola. Las compras capturadas quedan en `raw/compras_web/` (el archivo se crea con la primera compra registrada). La carga
 oficial a `curated/` y `analytics/` son las sentencias CTAS de Athena de `athena/etl/`
 (orden y recarga en su README).
 
@@ -62,6 +62,7 @@ oficial a `curated/` y `analytics/` son las sentencias CTAS de Athena de `athena
 /glue/                  → Definición de crawler y tablas del Data Catalog
 /scripts/               → Generador de datos sintéticos
 /powerbi/               → Proyecto PBIP del dashboard de gerencia (modelo semántico e informe)
+/PG2-009 – DAVID EDGAR RECINOS GARCÍA.md → Documento de tesis (texto)
 ```
 
 ## Modelo dimensional (resumen)

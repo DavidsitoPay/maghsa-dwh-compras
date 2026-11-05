@@ -13,7 +13,7 @@ s3://<bucket-maghsa-dwh>/
 │   ├── compras/
 │   │   └── anio=AAAA/mes=MM/registro_compras.csv
 │   ├── compras_web/
-│   │   └── registro_compras_web.csv    # escrito por el formulario; sin anio=/mes=
+│   │   └── registro_compras_web.csv    # lo crea el formulario con la primera compra registrada; sin anio=/mes=
 │   ├── proveedores/maestro_proveedores.csv
 │   ├── productos/maestro_productos.csv
 │   ├── categorias/catalogo_categorias.csv
@@ -55,7 +55,7 @@ s3://<bucket-maghsa-dwh>/
 ```
 
 `raw/compras/` guarda el histórico por partición `anio=`/`mes=`. `raw/compras_web/` guarda las
-compras capturadas por el formulario en un solo archivo (`OCW####`), fuera de esa jerarquía; la
+compras capturadas por el formulario en un solo archivo (`OCW####`), fuera de esa jerarquía; la Lambda crea el archivo y su prefijo con la primera compra capturada; la
 carga las une al histórico y las particiona por su `fecha`.
 
 Las tablas `puente_*` y `categoria_proveedor_x_categoria_producto` son relaciones N:M o de
@@ -74,11 +74,13 @@ detalle de por qué existen separadas de `dim_proveedor`.
   `MSCK REPAIR TABLE hechos_compras` al terminar.
 - **Ciclo de vida:** la regla `expirar-athena-results-30d` (habilitada) hace expirar a los 30 días
   los objetos bajo `athena-results/`, que guarda los resultados de consultas Athena: subprefijos
-  `powerbi/` (workgroup `maghsa-powerbi`), `etl/` y `tables/` (resultados de CTAS/ETL) y `tmp/`.
-  No hay reglas sobre `raw/`, `curated/` ni `analytics/`. Es una cuenta personal de pruebas con
+  `powerbi/` (workgroup `maghsa-powerbi`), `etl/` y `tables/` (resultados de CTAS/ETL).
+  La regla `abortar-multipart-7d` (todo el bucket, sin expiración de objetos) aborta las cargas multiparte incompletas a los 7 días.
+  No hay reglas de expiración sobre `raw/`, `curated/` ni `analytics/`; la única regla que alcanza todo el bucket es `abortar-multipart-7d`. Es una cuenta personal de pruebas con
   objetivo de gasto ~0: no hay nada programado; el crawler `crawler-maghsa-compras-analytics` no
   tiene schedule y se ejecuta a mano, y no hay triggers de Glue ni reglas de EventBridge o
   EventBridge Scheduler.
+- **Seguridad del bucket de datos:** cifrado SSE-S3 (AES256); versionado deshabilitado.
 
 ## Bucket de prueba (capa gratuita)
 

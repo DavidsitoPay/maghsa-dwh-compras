@@ -12,18 +12,16 @@ gratuita de AWS).
 | `maestro_proveedores.csv` | 8 proveedores de ejemplo (sin categoría embebida — ver normalización abajo) | `dim_proveedor` |
 | `maestro_productos.csv` | 11 productos de ejemplo | `dim_producto` |
 | `catalogo_categorias.csv` | 6 categorías de producto de ejemplo | `dim_categoria` |
-| `registro_compras.csv` | 97 órdenes de compra de ejemplo (enero–octubre 2026, generadas con `scripts/generar_datos_dummy.py`) (`unidad_organizacional_id`, ya no texto libre) | `hechos_compras` (falta `fecha_id` y `monto_total`, derivables en la carga) |
+| `registro_compras.csv` | 97 órdenes de compra de ejemplo (enero–octubre 2026, generadas con `scripts/generar_datos_dummy.py`) (con `unidad_organizacional_id`) | `hechos_compras` (falta `fecha_id` y `monto_total`, derivables en la carga) |
 
 ## Catálogos y relaciones normalizadas (proveedor ↔ categorías ↔ productos)
 
-`categoria_proveedor` dejó de ser una columna de texto libre en `maestro_proveedores.csv`,
-porque un proveedor puede pertenecer a más de una categoría (ver `PRV003`, que es tanto
-`Repuestos` como `Combustibles`). Se normalizó en las siguientes tablas:
+`categoria_proveedor` no es columna de `maestro_proveedores.csv`: un proveedor puede pertenecer a más de una categoría (ver `PRV003`, que es tanto `Repuestos` como `Combustibles`). Se modela en las siguientes tablas:
 
 | Archivo | Contenido |
 |---|---|
 | `categorias_proveedor.csv` | Catálogo de categorías de proveedor (Repuestos, Materia Prima, Servicios, Insumos, Combustibles) |
-| `unidades_organizacionales.csv` | Catálogo de unidades organizacionales (antes texto libre en `registro_compras.csv`) |
+| `unidades_organizacionales.csv` | Catálogo de unidades organizacionales (referenciado por `unidad_organizacional_id` en `registro_compras.csv`) |
 | `proveedor_categoria_proveedor.csv` | Relación N:M — a qué categoría(s) de proveedor pertenece cada proveedor |
 | `categoria_proveedor_x_categoria_producto.csv` | Regla de negocio: qué categorías de producto son válidas para cada categoría de proveedor (usada para filtrar el formulario de ingesta) |
 | `proveedor_categoria_producto.csv` | Relación N:M — qué categorías de producto suministra realmente cada proveedor |

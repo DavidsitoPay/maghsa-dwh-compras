@@ -22,7 +22,7 @@ AWS Lambda (lambda_function.py) -- Function URL publica --
         | valida codigo de acceso + reglas de negocio
         | lee/escribe CSV directamente en S3
         v
-Bucket de datos (zona raw/): proveedores, productos, categorias, compras
+Bucket de datos (zona raw/): maestros, relaciones, contactos y compras
 ```
 
 Dos buckets separados, a proposito:
@@ -57,11 +57,11 @@ Si algo falla, no se escribe nada en S3 y se devuelve el detalle del error.
 - `409`: eliminar un registro en uso, con `errores[]`. Proveedor o unidad con compras; producto con compras o relaciones proveedor-producto; categoria con productos, compras, categorias de producto de proveedores o reglas; categoria de proveedor con proveedores o reglas. No se borra nada.
 - `500`: `{"errores": ["Error interno del servidor."]}`, sin detalle; el detalle queda solo en el log de CloudWatch.
 
-## Modelo de datos (v2 -- normalizado)
+## Modelo de datos
 
-`categoria_proveedor` dejo de ser una columna de texto libre en `proveedores`: un proveedor
+`categoria_proveedor` no es columna de `proveedores`: un proveedor
 puede pertenecer a mas de una categoria (ejemplo real en el dataset: un mismo proveedor es
-"Repuestos" y "Combustibles" a la vez). Se normalizo en tablas puente, con una tabla adicional
+"Repuestos" y "Combustibles" a la vez). Se modela en tablas puente, con una tabla adicional
 de regla de negocio que define que categorias de producto son validas para cada categoria de
 proveedor -- es la que filtra los checkboxes del formulario en cascada. El detalle completo del
 esquema esta en `/modelo-dimensional/README.md`.
@@ -80,7 +80,7 @@ el formulario.
 `proveedor_categoria_proveedor`, `categoria_proveedor_x_categoria_producto`,
 `proveedor_categoria_producto`, `proveedor_x_producto`, `contacto_proveedor`.
 
-Las compras nuevas capturadas desde el formulario se acumulan en un archivo propio (`raw/compras_web/registro_compras_web.csv`, fuera de la jerarquia `anio=/mes=`) con identificador `OCW` + 4 digitos (`OCW0001`), separado del historico `OC0001..OC0097`, para no mezclarlos ni sobrescribirlos.
+Las compras nuevas capturadas desde el formulario se acumulan en un archivo propio (`raw/compras_web/registro_compras_web.csv`, fuera de la jerarquia `anio=/mes=`) con identificador `OCW` + 4 digitos (`OCW0001`), separado del historico `OC0001..OC0097`, para no mezclarlos ni sobrescribirlos. La Lambda crea el archivo en S3 al registrar la primera compra; el primer id es `OCW0001`.
 
 ## Seguridad de esta fase (cuenta personal / pruebas)
 

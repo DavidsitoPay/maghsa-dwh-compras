@@ -18,6 +18,8 @@ La carga oficial es `athena/etl/` (CTAS desde `raw/`; el orden de ejecución est
 bucket y actualiza el catálogo cuando cambian los datos. Es una alternativa a los DDL de Athena y
 no forma parte de la carga oficial.
 
+El crawler `crawler-maghsa-compras-analytics` existe en la cuenta (12 targets `analytics/*`, sin schedule y sin ejecuciones).
+
 ```bash
 aws glue create-crawler --cli-input-json file://crawler-config.json
 aws glue start-crawler --name crawler-maghsa-compras-analytics
