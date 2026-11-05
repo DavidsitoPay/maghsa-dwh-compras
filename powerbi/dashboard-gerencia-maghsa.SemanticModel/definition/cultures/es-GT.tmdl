@@ -1,0 +1,473 @@
+cultureInfo es-GT
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "dim_tiempo.nombre_mes": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_tiempo",
+			          "ConceptualProperty": "nombre_mes"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mes": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_unidad_organizacional.nombre": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_unidad_organizacional",
+			          "ConceptualProperty": "nombre"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Unidad organizacional": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_proveedor.nombre": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_proveedor",
+			          "ConceptualProperty": "nombre"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Proveedor": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_proveedor.estado": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_proveedor",
+			          "ConceptualProperty": "estado"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Estado": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_categoria.nombre_categoria": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_categoria",
+			          "ConceptualProperty": "nombre_categoria"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Categoría": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_producto.nombre": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_producto",
+			          "ConceptualProperty": "nombre"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Producto": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.condicion_pago": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "condicion_pago"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Condición de pago": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_tiempo.dia": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_tiempo",
+			          "ConceptualProperty": "dia"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Día del mes": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.gasto_acumulado_mes_en_curso": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Gasto Acumulado Mes en Curso"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mes en curso": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.gasto_acumulado_mes_anterior": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Gasto Acumulado Mes Anterior"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mes anterior": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.proveedores_vigentes_del_producto": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Proveedores Vigentes del Producto"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Proveedores vigentes": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.gasto_al_proveedor": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Gasto al Proveedor"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Gasto": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.participación_en_el_gasto_del_producto": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Participación en el Gasto del Producto"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% del gasto del producto": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.precio_promedio_al_proveedor": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Precio Promedio al Proveedor"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Precio promedio": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.diferencia_de_precio_vs_proveedor_principal": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Diferencia de Precio vs Proveedor Principal"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Dif. precio vs principal": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.lead_time_al_proveedor_días": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Lead Time al Proveedor (días)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Entrega (días)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.diferencia_de_lead_time_vs_proveedor_principal_días": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Diferencia de Lead Time vs Proveedor Principal (días)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Dif. entrega vs principal": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "hechos_compras.última_compra_al_proveedor": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "hechos_compras",
+			          "ConceptualProperty": "Última Compra al Proveedor"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Última compra": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "v_alternativas_proveedor.categoria": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "v_alternativas_proveedor",
+			          "ConceptualProperty": "categoria"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Categoría": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "v_alternativas_proveedor.producto": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "v_alternativas_proveedor",
+			          "ConceptualProperty": "producto"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Producto": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "v_alternativas_proveedor.proveedor": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "v_alternativas_proveedor",
+			          "ConceptualProperty": "proveedor"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Proveedor": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "v_alternativas_proveedor.situacion": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "v_alternativas_proveedor",
+			          "ConceptualProperty": "situacion"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Situación": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

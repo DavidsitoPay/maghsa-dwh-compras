@@ -1,0 +1,26 @@
+relationship 7c1d2a10-3b4e-4f60-9a11-0000000000a1
+	fromColumn: hechos_compras.fecha_id
+	toColumn: dim_tiempo.fecha_id
+
+relationship 7c1d2a10-3b4e-4f60-9a11-0000000000a2
+	fromColumn: hechos_compras.proveedor_id
+	toColumn: dim_proveedor.proveedor_id
+
+relationship 7c1d2a10-3b4e-4f60-9a11-0000000000a3
+	fromColumn: hechos_compras.producto_id
+	toColumn: dim_producto.producto_id
+
+relationship 7c1d2a10-3b4e-4f60-9a11-0000000000a4
+	fromColumn: hechos_compras.categoria_id
+	toColumn: dim_categoria.categoria_id
+
+relationship 7c1d2a10-3b4e-4f60-9a11-0000000000a5
+	fromColumn: hechos_compras.unidad_organizacional_id
+	toColumn: dim_unidad_organizacional.unidad_organizacional_id
+
+relationship 7c1d2a10-3b4e-4f60-9a11-0000000000a6
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: dim_producto.producto_id
+	toColumn: v_producto_proveedores_vigentes.producto_id
+

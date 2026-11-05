@@ -1,0 +1,64 @@
+table dim_proveedor
+	lineageTag: 5c120c37-233c-47b6-9ef1-669c7129848e
+
+	column proveedor_id
+		dataType: string
+		lineageTag: e4b7d549-a7db-48b7-bd59-e70adf5283ca
+		summarizeBy: none
+		sourceColumn: proveedor_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre
+		dataType: string
+		lineageTag: aff27500-6321-4bc6-846c-de31b0401901
+		summarizeBy: none
+		sourceColumn: nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column pais
+		dataType: string
+		lineageTag: d3b37644-4342-4416-86d7-9e9e27dd7fa3
+		summarizeBy: none
+		sourceColumn: pais
+
+		annotation SummarizationSetBy = Automatic
+
+	column localizacion
+		dataType: string
+		lineageTag: 5965de5a-816e-428c-9195-9da021322779
+		summarizeBy: none
+		sourceColumn: localizacion
+
+		annotation SummarizationSetBy = Automatic
+
+	column condiciones_pago
+		dataType: string
+		lineageTag: da59d98a-d38f-4abd-b8e6-81024c0728ae
+		summarizeBy: none
+		sourceColumn: condiciones_pago
+
+		annotation SummarizationSetBy = Automatic
+
+	column estado
+		dataType: string
+		lineageTag: 3a63cc73-d567-480c-94d7-e94e9094ab34
+		summarizeBy: none
+		sourceColumn: estado
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_proveedor = m
+		mode: import
+		source =
+				let
+				    Origen = Odbc.DataSource("dsn=maghsa-athena;awsregion=us-east-1;workgroup=maghsa-powerbi", [HierarchicalNavigation=true]),
+				    AwsDataCatalog_Database = Origen{[Name="AwsDataCatalog",Kind="Database"]}[Data],
+				    compras_dwh_Schema = AwsDataCatalog_Database{[Name="compras_dwh",Kind="Schema"]}[Data],
+				    dim_proveedor_Table = compras_dwh_Schema{[Name="dim_proveedor",Kind="Table"]}[Data]
+				in
+				    dim_proveedor_Table
+
+	annotation PBI_ResultType = Table
+

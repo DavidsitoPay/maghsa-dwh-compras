@@ -1,0 +1,26 @@
+model Model
+	culture: es-GT
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-GT
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["hechos_compras","dim_proveedor","dim_tiempo","dim_producto","dim_unidad_organizacional","dim_categoria","v_producto_proveedores_vigentes","v_alternativas_proveedor"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table hechos_compras
+ref table dim_proveedor
+ref table dim_tiempo
+ref table dim_producto
+ref table dim_unidad_organizacional
+ref table dim_categoria
+ref table v_producto_proveedores_vigentes
+ref table v_alternativas_proveedor
+
+ref cultureInfo es-GT
+

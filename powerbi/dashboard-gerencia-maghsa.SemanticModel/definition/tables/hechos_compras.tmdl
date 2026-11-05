@@ -1,0 +1,559 @@
+table hechos_compras
+	lineageTag: d795e8f4-5aa0-4490-a736-60107d7f422c
+
+	measure 'Gasto Total' = SUM(hechos_compras[monto_total])
+		formatString: "Q"#,##0.00
+		displayFolder: 1 Gasto
+		lineageTag: eceb97f7-d17f-4c20-9642-e83fc4c0f0a0
+
+	measure 'Órdenes de Compra' = DISTINCTCOUNT(hechos_compras[id_compra])
+		formatString: #,##0
+		displayFolder: 1 Gasto
+		lineageTag: 9f613cad-eed9-4b6d-888a-f5f4cf19ef69
+
+	measure 'Líneas de Compra' = COUNTROWS(hechos_compras)
+		formatString: #,##0
+		displayFolder: 1 Gasto
+		lineageTag: a623c87f-7743-4c0e-a216-4dc0b41af0e1
+
+	measure 'Ticket Promedio por Orden' = DIVIDE([Gasto Total], [Órdenes de Compra])
+		formatString: "Q"#,##0.00
+		displayFolder: 1 Gasto
+		lineageTag: 632cf924-e8e3-4875-9854-f32c961a7178
+
+	measure 'Cantidad Total' = SUM(hechos_compras[cantidad])
+		formatString: #,##0.##
+		displayFolder: 1 Gasto
+		lineageTag: ec2c6165-e178-4282-8e53-48d0f10457fc
+
+	measure 'Precio Promedio Ponderado' = DIVIDE([Gasto Total], [Cantidad Total])
+		formatString: "Q"#,##0.00
+		displayFolder: 1 Gasto
+		lineageTag: f1c6fcf8-46d5-4128-9405-194267985c2c
+
+	measure '% del Total' =
+			DIVIDE(
+			    [Gasto Total],
+			    CALCULATE([Gasto Total], ALLSELECTED())
+			)
+		formatString: 0.0%
+		displayFolder: 1 Gasto
+		lineageTag: 36046613-c60d-435d-b5c2-83cc1641fc08
+
+	measure 'Gasto Acumulado del Año' = TOTALYTD([Gasto Total], dim_tiempo[fecha])
+		formatString: "Q"#,##0.00
+		displayFolder: 2 Tendencia
+		lineageTag: 99f6f9e1-fa5d-4767-949b-5c70fd8a67d5
+
+	measure 'Proveedores con Compras' = DISTINCTCOUNT(hechos_compras[proveedor_id])
+		formatString: #,##0
+		displayFolder: 3 Proveedores
+		lineageTag: 5a121dd3-695e-446f-a7da-7bf4505d34f1
+
+	measure '% Acumulado Proveedores (Pareto)' =
+			VAR gastoActual = [Gasto Total]
+			VAR proveedores = ALLSELECTED(dim_proveedor[nombre])
+			VAR acumulado =
+			    SUMX(
+			        FILTER(proveedores, [Gasto Total] >= gastoActual),
+			        [Gasto Total]
+			    )
+			RETURN
+			    DIVIDE(acumulado, CALCULATE([Gasto Total], ALLSELECTED(dim_proveedor)))
+		formatString: 0.0%
+		displayFolder: 3 Proveedores
+		lineageTag: 0c054bec-0299-4dae-9475-e52589b19a5b
+
+	measure 'Gasto a Proveedores Inactivos' = CALCULATE([Gasto Total], dim_proveedor[estado] <> "vigente") + 0
+		formatString: "Q"#,##0.00
+		displayFolder: 3 Proveedores
+		lineageTag: 3c1b78dd-098d-4e1e-9595-cabdea3553eb
+
+	measure 'Lead Time Promedio (días)' = AVERAGE(hechos_compras[lead_time_dias])
+		formatString: 0.0
+		displayFolder: 4 Entrega
+		lineageTag: da15dcf5-7131-47b5-9a02-ea614f866d9d
+
+	measure 'Lead Time Máximo (días)' = MAX(hechos_compras[lead_time_dias])
+		formatString: 0
+		displayFolder: 4 Entrega
+		lineageTag: 948a0766-cf1f-4d3c-b4bd-75f851fa590b
+
+	/// Plazo máximo aceptable de entrega. Ajustar según la política de MAGHSA.
+	measure 'Umbral de Entrega (días)' = 7
+		formatString: 0
+		displayFolder: 4 Entrega
+		lineageTag: 463c3f97-d228-43b2-b9be-729973476ee7
+
+	measure 'Órdenes Entregadas en Umbral' =
+			CALCULATE(
+			    DISTINCTCOUNT(hechos_compras[id_compra]),
+			    FILTER(hechos_compras, hechos_compras[lead_time_dias] <= [Umbral de Entrega (días)])
+			)
+		formatString: #,##0
+		displayFolder: 4 Entrega
+		lineageTag: 2c3218d8-ca8b-411d-a7fb-db112276320c
+
+	measure '% Cumplimiento de Entrega' = DIVIDE([Órdenes Entregadas en Umbral] + 0, [Órdenes de Compra])
+		formatString: 0.0%
+		displayFolder: 4 Entrega
+		lineageTag: 63752d11-07e0-4052-8bbe-e621e1b77258
+
+	measure 'Datos hasta' = CALCULATE(MAX(dim_tiempo[fecha]), hechos_compras)
+		formatString: dd/mm/yyyy
+		displayFolder: 5 Semáforo
+		lineageTag: 3f3cb19d-7286-4539-9485-8679d977a982
+
+	/// Referencia de semáforo (a validar con MAGHSA): meta de entregas dentro del umbral.
+	measure 'Meta Cumplimiento de Entrega' = 0.9
+		formatString: 0%
+		displayFolder: 5 Semáforo
+		lineageTag: 41eb483c-4706-4035-bd6a-82659d92c065
+
+	/// Referencia de semáforo (a validar con MAGHSA): por debajo de este valor el indicador es crítico.
+	measure 'Mínimo Cumplimiento de Entrega' = 0.7
+		formatString: 0%
+		displayFolder: 5 Semáforo
+		lineageTag: 3c190fc8-e7fd-4212-90e7-1af1f93f45c1
+
+	/// Referencia de semáforo (a validar con MAGHSA): lead time a partir del cual el indicador es crítico.
+	measure 'Alerta Lead Time (días)' = 10
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: 0af5d02d-a65a-4a4e-9988-5ead3f5a12c0
+
+	/// Referencia de semáforo (a validar con MAGHSA): participación máxima deseable de un proveedor.
+	measure 'Límite Concentración Proveedor' = 0.4
+		formatString: 0%
+		displayFolder: 5 Semáforo
+		lineageTag: ba829ee9-2a4e-410c-bacf-084473608d5b
+
+	/// Referencia de semáforo (a validar con MAGHSA): participación a partir de la cual es crítico.
+	measure 'Alerta Concentración Proveedor' = 0.6
+		formatString: 0%
+		displayFolder: 5 Semáforo
+		lineageTag: 9e8a8685-a18c-456c-a3c0-ab35fc427cfb
+
+	/// Referencia de semáforo (a validar con MAGHSA): porcentaje deseable de productos con un solo proveedor.
+	measure 'Límite Proveedor Único' = 0.3
+		formatString: 0%
+		displayFolder: 5 Semáforo
+		lineageTag: a7735f51-9394-42b6-96e2-e9128b075d7a
+
+	/// Referencia de semáforo (a validar con MAGHSA): porcentaje a partir del cual es crítico.
+	measure 'Alerta Proveedor Único' = 0.6
+		formatString: 0%
+		displayFolder: 5 Semáforo
+		lineageTag: 41dc2d43-fb96-4d8a-a5f1-b44ec9afda87
+
+	measure 'Mayor Proveedor %' =
+			VAR total = CALCULATE([Gasto Total], ALLSELECTED(dim_proveedor))
+			RETURN
+			    DIVIDE(MAXX(ALLSELECTED(dim_proveedor[nombre]), [Gasto Total]), total)
+		formatString: 0.0%
+		displayFolder: 5 Semáforo
+		lineageTag: c2278716-0e9a-4e24-bf1c-6f76120d61db
+
+	measure '% Productos con Proveedor Único' =
+			DIVIDE(
+			    CALCULATE(COUNTROWS(v_producto_proveedores_vigentes), v_producto_proveedores_vigentes[proveedores_vigentes] = 1) + 0,
+			    COUNTROWS(v_producto_proveedores_vigentes)
+			)
+		formatString: 0%
+		displayFolder: 5 Semáforo
+		lineageTag: 59a99f11-e120-4e7f-8381-591383d10b8f
+
+	measure 'Estado Cumplimiento' =
+			VAR v = [% Cumplimiento de Entrega]
+			RETURN IF(ISBLANK(v), BLANK(), IF(v >= [Meta Cumplimiento de Entrega], 0, IF(v >= [Mínimo Cumplimiento de Entrega], 1, 2)))
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: 4bdef202-78a3-405f-9a92-80787f054cbf
+
+	measure 'Estado Lead Time' =
+			VAR v = [Lead Time Promedio (días)]
+			RETURN IF(ISBLANK(v), BLANK(), IF(v <= [Umbral de Entrega (días)], 0, IF(v <= [Alerta Lead Time (días)], 1, 2)))
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: 1b01e885-a53e-438e-a977-61eee73f3433
+
+	measure 'Estado Concentración' =
+			VAR v = [Mayor Proveedor %]
+			RETURN IF(ISBLANK(v), BLANK(), IF(v <= [Límite Concentración Proveedor], 0, IF(v <= [Alerta Concentración Proveedor], 1, 2)))
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: d2e65399-c579-4504-8669-4c94e8195756
+
+	measure 'Estado Proveedor Único' =
+			VAR v = [% Productos con Proveedor Único]
+			RETURN IF(ISBLANK(v), BLANK(), IF(v <= [Límite Proveedor Único], 0, IF(v <= [Alerta Proveedor Único], 1, 2)))
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: d277f11e-8dd9-446c-9ea4-d18bd9d0366b
+
+	measure 'Estado Compras No Vigentes' = IF([Gasto a Proveedores Inactivos] > 0, 2, 0)
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: cf66902a-4794-46da-9411-019b2cdada6c
+
+	measure 'Color Cumplimiento' = SWITCH([Estado Cumplimiento], 0, "#2E7D32", 1, "#D98E04", 2, "#C62828", "#6C757D")
+		displayFolder: 5 Semáforo
+		lineageTag: a0d94171-46cb-4ec3-b0ad-117ac1bdcf19
+
+	measure 'Color Lead Time' = SWITCH([Estado Lead Time], 0, "#2E7D32", 1, "#D98E04", 2, "#C62828", "#6C757D")
+		displayFolder: 5 Semáforo
+		lineageTag: f93abb6c-e4f3-451d-bfa3-14c2ffa11456
+
+	measure 'Color Concentración' = SWITCH([Estado Concentración], 0, "#2E7D32", 1, "#D98E04", 2, "#C62828", "#6C757D")
+		displayFolder: 5 Semáforo
+		lineageTag: 41c61316-925c-41b5-a481-f0aac819e31d
+
+	measure 'Color Proveedor Único' = SWITCH([Estado Proveedor Único], 0, "#2E7D32", 1, "#D98E04", 2, "#C62828", "#6C757D")
+		displayFolder: 5 Semáforo
+		lineageTag: c9aea96b-3273-4cb4-8111-768ba1ebfc4c
+
+	measure 'Color Compras No Vigentes' = SWITCH([Estado Compras No Vigentes], 0, "#2E7D32", 1, "#D98E04", 2, "#C62828", "#6C757D")
+		displayFolder: 5 Semáforo
+		lineageTag: 071c7601-1d76-4b5e-971b-1d79a8c4fe29
+
+	measure 'Indicadores en Rojo' =
+			IF([Estado Cumplimiento] = 2, 1, 0) + IF([Estado Lead Time] = 2, 1, 0) + IF([Estado Concentración] = 2, 1, 0)
+			    + IF([Estado Proveedor Único] = 2, 1, 0) + IF([Estado Compras No Vigentes] = 2, 1, 0)
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: 298b76f5-3ab5-434d-a974-e2d1f08abc51
+
+	measure 'Indicadores en Atención' =
+			IF([Estado Cumplimiento] = 1, 1, 0) + IF([Estado Lead Time] = 1, 1, 0) + IF([Estado Concentración] = 1, 1, 0)
+			    + IF([Estado Proveedor Único] = 1, 1, 0) + IF([Estado Compras No Vigentes] = 1, 1, 0)
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: 8a8f6d36-f2f9-4050-a221-2c91add5ca36
+
+	measure 'Estado General' =
+			IF(
+			    [Indicadores en Rojo] > 0,
+			    [Indicadores en Rojo] & " de 5 en rojo",
+			    IF([Indicadores en Atención] > 0, [Indicadores en Atención] & " de 5 en atención", "Todo en orden")
+			)
+		displayFolder: 5 Semáforo
+		lineageTag: 149390e9-c6f5-4c21-84c7-9d20a271ca84
+
+	measure 'Color Estado General' = IF([Indicadores en Rojo] > 0, "#C62828", IF([Indicadores en Atención] > 0, "#D98E04", "#2E7D32"))
+		displayFolder: 5 Semáforo
+		lineageTag: 76114eaa-09eb-47c3-913c-23d60bca865e
+
+	/// Cantidad de indicadores del semáforo que cumplen su meta (estado verde).
+	measure 'Indicadores en Verde' =
+			IF([Estado Cumplimiento] = 0, 1, 0) + IF([Estado Lead Time] = 0, 1, 0) + IF([Estado Concentración] = 0, 1, 0)
+			    + IF([Estado Proveedor Único] = 0, 1, 0) + IF([Estado Compras No Vigentes] = 0, 1, 0)
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: bb1e6671-add1-45c4-8c30-bf206c885b5f
+
+	measure 'Total Indicadores' = 5
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: ce9f69fa-db10-44af-b4cf-6ca7e0ffe31e
+
+	measure 'Mínimo Indicadores' = 0
+		formatString: 0
+		displayFolder: 5 Semáforo
+		lineageTag: 9ef90f0e-cbc5-4797-99fc-6c7398c02794
+
+	measure 'Datos al' =
+			VAR f = MAXX(ALL(hechos_compras[fecha_id]), VALUE(hechos_compras[fecha_id]))
+			RETURN IF(NOT ISBLANK(f), DATE(INT(f / 10000), MOD(INT(f / 100), 100), MOD(f, 100)))
+		formatString: dd/mm/yyyy
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000001
+
+	measure 'Inicio Mes en Curso' = IF(NOT ISBLANK([Datos al]), DATE(YEAR([Datos al]), MONTH([Datos al]), 1))
+		formatString: dd/mm/yyyy
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000002
+
+	measure 'Día N' = IF(NOT ISBLANK([Datos al]), DAY([Datos al]))
+		formatString: 0
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000003
+
+	measure 'Gasto Tramo Mes en Curso' =
+			VAR ini = [Inicio Mes en Curso]
+			RETURN IF(NOT ISBLANK(ini), CALCULATE([Gasto Total], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= ini) + 0)
+		formatString: "Q"#,##0.00
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000004
+
+	measure 'Gasto Tramo Mes Anterior' =
+			VAR ini = [Inicio Mes en Curso]
+			VAR ant = EDATE(ini, -1)
+			VAR fin = MIN(ant + [Día N] - 1, ini - 1)
+			RETURN IF(NOT ISBLANK(ini), CALCULATE([Gasto Total], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= ant, dim_tiempo[fecha] <= fin) + 0)
+		formatString: "Q"#,##0.00
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000005
+
+	measure 'Seguimiento Texto' =
+			VAR n = [Día N]
+			VAR ant = [Gasto Tramo Mes Anterior]
+			VAR v = IF(n >= 5 && ant > 0, DIVIDE([Gasto Tramo Mes en Curso] - ant, ant))
+			RETURN IF(ISBLANK(v), IF(n < 5, "Disponible desde el día 5", "Sin base de comparación"), IF(v > 0, "▲ ", IF(v < 0, "▼ ", "")) & FORMAT(ABS(v), "0.0%"))
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000006
+
+	measure 'Nota Seguimiento' =
+			VAR n = [Día N]
+			VAR ini = [Inicio Mes en Curso]
+			RETURN IF(ISBLANK(n), "Sin datos", "Datos al " & FORMAT([Datos al], "dd/mm/yyyy") & " · día " & n & ": 1–" & n & " " & FORMAT(ini, "mmmm") & " vs 1–" & n & " " & FORMAT(EDATE(ini, -1), "mmmm"))
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000007
+
+	measure 'Gasto Último Mes Completo' =
+			VAR ini = [Inicio Mes en Curso]
+			RETURN IF(NOT ISBLANK(ini), CALCULATE([Gasto Total], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= EDATE(ini, -1), dim_tiempo[fecha] < ini))
+		formatString: "Q"#,##0.00
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000008
+
+	measure 'Gasto Mes Completo Anterior' =
+			VAR ini = [Inicio Mes en Curso]
+			RETURN IF(NOT ISBLANK(ini), CALCULATE([Gasto Total], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= EDATE(ini, -2), dim_tiempo[fecha] < EDATE(ini, -1)))
+		formatString: "Q"#,##0.00
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000009
+
+	measure 'Variación Mes Completo Texto' =
+			VAR v = DIVIDE([Gasto Último Mes Completo] - [Gasto Mes Completo Anterior], [Gasto Mes Completo Anterior])
+			RETURN IF(ISBLANK(v), "Sin mes previo para comparar", IF(v > 0, "▲ ", IF(v < 0, "▼ ", "")) & FORMAT(ABS(v), "0.0%"))
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000000a
+
+	measure 'Nota Mes Completo' =
+			VAR ini = [Inicio Mes en Curso]
+			RETURN IF(ISBLANK(ini), "Sin datos", FORMAT(EDATE(ini, -1), "mmmm yyyy") & " vs " & FORMAT(EDATE(ini, -2), "mmmm yyyy") & " · Q" & FORMAT([Gasto Último Mes Completo], "#,##0") & " vs Q" & FORMAT([Gasto Mes Completo Anterior], "#,##0"))
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000000b
+
+	measure 'Gasto Acumulado Mes en Curso' =
+			VAR ini = [Inicio Mes en Curso]
+			VAR dia = MAX(dim_tiempo[dia])
+			RETURN IF(NOT ISBLANK(ini) && dia <= [Día N], CALCULATE([Gasto Total], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= ini, dim_tiempo[fecha] <= ini + dia - 1) + 0)
+		formatString: "Q"#,##0.00
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000000d
+
+	measure 'Gasto Acumulado Mes Anterior' =
+			VAR ini = [Inicio Mes en Curso]
+			VAR ant = EDATE(ini, -1)
+			VAR dia = MAX(dim_tiempo[dia])
+			RETURN IF(NOT ISBLANK(ini) && ant + dia - 1 < ini, CALCULATE([Gasto Total], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= ant, dim_tiempo[fecha] <= ant + dia - 1) + 0)
+		formatString: "Q"#,##0.00
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000000e
+
+	measure 'Proveedores Vigentes del Producto' = IF(NOT ISBLANK([Gasto Total]), MAX(v_producto_proveedores_vigentes[proveedores_vigentes]))
+		formatString: #,##0
+		displayFolder: 3 Proveedores
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000000c
+
+	/// Proveedores vigentes autorizados para el producto, distintos del que más se compró.
+	measure 'Alternativas Disponibles' = CALCULATE(COUNTROWS(v_alternativas_proveedor), v_alternativas_proveedor[situacion_codigo] IN {"secundario", "sin_compras_vigente"}) + 0
+		formatString: #,##0
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000050
+
+	/// Alternativas vigentes a las que sí se les compró alguna vez.
+	measure 'Alternativas Utilizadas' = CALCULATE(COUNTROWS(v_alternativas_proveedor), v_alternativas_proveedor[situacion_codigo] = "secundario") + 0
+		formatString: #,##0
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000051
+
+	/// Alternativas vigentes a las que nunca se les compró.
+	measure 'Alternativas Nunca Utilizadas' = CALCULATE(COUNTROWS(v_alternativas_proveedor), v_alternativas_proveedor[situacion_codigo] = "sin_compras_vigente") + 0
+		formatString: #,##0
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000052
+
+	/// Gasto acumulado con el proveedor en el producto.
+	measure 'Gasto al Proveedor' = SUM(v_alternativas_proveedor[gasto])
+		formatString: "Q"#,##0.00
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000053
+
+	/// Precio promedio ponderado por cantidad; vacío si nunca se compró.
+	measure 'Precio Promedio al Proveedor' = DIVIDE(SUM(v_alternativas_proveedor[gasto]), SUM(v_alternativas_proveedor[unidades]))
+		formatString: "Q"#,##0.00
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000055
+
+	/// Días promedio de entrega; vacío si nunca se compró.
+	measure 'Lead Time al Proveedor (días)' = AVERAGE(v_alternativas_proveedor[lead_time_promedio_dias])
+		formatString: 0.0
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000056
+
+	/// Parte del gasto del producto que fue a este proveedor.
+	measure 'Participación en el Gasto del Producto' = MAX(v_alternativas_proveedor[pct_gasto_producto])
+		formatString: 0.0%
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000057
+
+	/// Negativo = más barato que el proveedor al que más se compró.
+	measure 'Diferencia de Precio vs Proveedor Principal' = MAX(v_alternativas_proveedor[dif_precio_vs_principal_pct])
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000058
+
+	/// Negativo = entrega más rápido que el proveedor principal.
+	measure 'Diferencia de Lead Time vs Proveedor Principal (días)' = MAX(v_alternativas_proveedor[dif_lead_time_vs_principal_dias])
+		formatString: +0.0;-0.0;0.0
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000059
+
+	/// Fecha de la última compra a este proveedor para el producto.
+	measure 'Última Compra al Proveedor' = MAX(v_alternativas_proveedor[ultima_compra])
+		formatString: dd/mm/yyyy
+		displayFolder: 6 Alternativas
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000005a
+
+	column id_compra
+		dataType: string
+		lineageTag: dcb1811c-0b5d-4fdc-a258-f7594ec92bcf
+		summarizeBy: none
+		sourceColumn: id_compra
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha_id
+		dataType: string
+		isHidden
+		lineageTag: a4a57c6d-9819-4d8e-a74b-b67e3b208a07
+		summarizeBy: none
+		sourceColumn: fecha_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column proveedor_id
+		dataType: string
+		isHidden
+		lineageTag: 9498e7ef-9240-4ad6-ac7d-563c6ae5ebd7
+		summarizeBy: none
+		sourceColumn: proveedor_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column producto_id
+		dataType: string
+		isHidden
+		lineageTag: 55589425-9275-407c-b4b0-0431cf0b296f
+		summarizeBy: none
+		sourceColumn: producto_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria_id
+		dataType: string
+		isHidden
+		lineageTag: e0abdeca-2d71-484b-9b8a-e19db5ed378f
+		summarizeBy: none
+		sourceColumn: categoria_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column unidad_organizacional_id
+		dataType: string
+		isHidden
+		lineageTag: 87b5e690-4e7d-4fe8-a81a-9531f9144e8c
+		summarizeBy: none
+		sourceColumn: unidad_organizacional_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column cantidad
+		dataType: double
+		isHidden
+		lineageTag: da7631ea-b288-4a4d-90ab-ac84d2765e9e
+		summarizeBy: none
+		sourceColumn: cantidad
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column precio_unitario
+		dataType: double
+		formatString: "Q"#,##0.00
+		lineageTag: 18f70e2b-e189-4849-ba62-c616e3fd40bf
+		summarizeBy: none
+		sourceColumn: precio_unitario
+
+		annotation SummarizationSetBy = Automatic
+
+	column monto_total
+		dataType: double
+		isHidden
+		lineageTag: f1663b20-261a-422f-a896-4a1eb709f0ea
+		summarizeBy: none
+		sourceColumn: monto_total
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column moneda
+		dataType: string
+		lineageTag: 15db4496-ee02-4e2d-8515-3a60764be020
+		summarizeBy: none
+		sourceColumn: moneda
+
+		annotation SummarizationSetBy = Automatic
+
+	column condicion_pago
+		dataType: string
+		lineageTag: 6ef209b0-4ca9-4aa5-9bd5-baee0566a28c
+		summarizeBy: none
+		sourceColumn: condicion_pago
+
+		annotation SummarizationSetBy = Automatic
+
+	column lead_time_dias
+		dataType: int64
+		formatString: 0
+		lineageTag: 693d2457-b4dd-444e-b3ad-51ccf9d2a30c
+		summarizeBy: none
+		sourceColumn: lead_time_dias
+
+		annotation SummarizationSetBy = Automatic
+
+	column anio
+		dataType: string
+		isHidden
+		lineageTag: 3c1f9ec7-226a-44d2-876f-ce7d66136a62
+		summarizeBy: none
+		sourceColumn: anio
+
+		annotation SummarizationSetBy = Automatic
+
+	column mes
+		dataType: string
+		isHidden
+		lineageTag: 2530a72a-3b61-41d5-ad31-d0717eb1793c
+		summarizeBy: none
+		sourceColumn: mes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition hechos_compras = m
+		mode: import
+		source =
+				let
+				    Origen = Odbc.DataSource("dsn=maghsa-athena;awsregion=us-east-1;workgroup=maghsa-powerbi", [HierarchicalNavigation=true]),
+				    AwsDataCatalog_Database = Origen{[Name="AwsDataCatalog",Kind="Database"]}[Data],
+				    compras_dwh_Schema = AwsDataCatalog_Database{[Name="compras_dwh",Kind="Schema"]}[Data],
+				    hechos_compras_Table = compras_dwh_Schema{[Name="hechos_compras",Kind="Table"]}[Data]
+				in
+				    hechos_compras_Table
+
+	annotation PBI_ResultType = Table
+

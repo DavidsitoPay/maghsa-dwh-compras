@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "dashboard-gerencia-maghsa"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4d9d5222-b3b4-4613-af60-d9e6a6fa3f8e"
+  }
+}

@@ -1,0 +1,32 @@
+table dim_unidad_organizacional
+	lineageTag: 1e5afaee-2f82-451d-90b0-af78770d84aa
+
+	column unidad_organizacional_id
+		dataType: string
+		lineageTag: a0da1469-c800-4bf1-92ad-97fa6621967c
+		summarizeBy: none
+		sourceColumn: unidad_organizacional_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre
+		dataType: string
+		lineageTag: 5c9518d1-f69d-4cc2-b946-d0c2606b2dfa
+		summarizeBy: none
+		sourceColumn: nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_unidad_organizacional = m
+		mode: import
+		source =
+				let
+				    Origen = Odbc.DataSource("dsn=maghsa-athena;awsregion=us-east-1;workgroup=maghsa-powerbi", [HierarchicalNavigation=true]),
+				    AwsDataCatalog_Database = Origen{[Name="AwsDataCatalog",Kind="Database"]}[Data],
+				    compras_dwh_Schema = AwsDataCatalog_Database{[Name="compras_dwh",Kind="Schema"]}[Data],
+				    dim_unidad_organizacional_Table = compras_dwh_Schema{[Name="dim_unidad_organizacional",Kind="Table"]}[Data]
+				in
+				    dim_unidad_organizacional_Table
+
+	annotation PBI_ResultType = Table
+

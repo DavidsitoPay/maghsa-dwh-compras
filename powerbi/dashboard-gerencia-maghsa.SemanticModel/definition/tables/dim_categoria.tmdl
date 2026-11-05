@@ -1,0 +1,40 @@
+table dim_categoria
+	lineageTag: db60ff54-ef2c-4882-a131-0b583e1fd080
+
+	column categoria_id
+		dataType: string
+		lineageTag: 333f2c39-47f3-4676-bf29-1cb3565f7715
+		summarizeBy: none
+		sourceColumn: categoria_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_categoria
+		dataType: string
+		lineageTag: cb48a9d5-f1d1-4af2-88eb-e935c97ad692
+		summarizeBy: none
+		sourceColumn: nombre_categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column familia_gasto
+		dataType: string
+		lineageTag: 6a7418e7-7153-49e7-96fd-20a88de3391a
+		summarizeBy: none
+		sourceColumn: familia_gasto
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_categoria = m
+		mode: import
+		source =
+				let
+				    Origen = Odbc.DataSource("dsn=maghsa-athena;awsregion=us-east-1;workgroup=maghsa-powerbi", [HierarchicalNavigation=true]),
+				    AwsDataCatalog_Database = Origen{[Name="AwsDataCatalog",Kind="Database"]}[Data],
+				    compras_dwh_Schema = AwsDataCatalog_Database{[Name="compras_dwh",Kind="Schema"]}[Data],
+				    dim_categoria_Table = compras_dwh_Schema{[Name="dim_categoria",Kind="Table"]}[Data]
+				in
+				    dim_categoria_Table
+
+	annotation PBI_ResultType = Table
+

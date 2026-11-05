@@ -1,0 +1,91 @@
+table dim_tiempo
+	lineageTag: cffc9ef6-738f-44bf-9a10-af6f13ad6a02
+	dataCategory: Time
+
+	column fecha_id
+		dataType: string
+		isHidden
+		lineageTag: a4f54816-bcc5-41c9-8c81-40348c6e6e23
+		summarizeBy: none
+		sourceColumn: fecha_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha
+		dataType: dateTime
+		isKey
+		formatString: dd/mm/yyyy
+		lineageTag: a125e5b4-3b7a-4658-91d6-2d89a5fd43d9
+		summarizeBy: none
+		sourceColumn: fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column anio
+		dataType: int64
+		formatString: 0
+		lineageTag: f9c2eb72-464d-4e9e-aac7-ff7b8194d7a8
+		summarizeBy: none
+		sourceColumn: anio
+
+		annotation SummarizationSetBy = Automatic
+
+	column trimestre
+		dataType: int64
+		formatString: 0
+		lineageTag: 7e772422-7284-4d8b-abb0-228591275172
+		summarizeBy: none
+		sourceColumn: trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column mes
+		dataType: int64
+		formatString: 0
+		lineageTag: 519823b8-897f-4c39-ab75-e2ab8860f2a9
+		summarizeBy: none
+		sourceColumn: mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_mes
+		dataType: string
+		lineageTag: 3e5cc907-8c81-4eec-b977-c9126b459d47
+		summarizeBy: none
+		sourceColumn: nombre_mes
+		sortByColumn: mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column dia
+		dataType: int64
+		formatString: 0
+		lineageTag: b4f011f0-8f8a-4b74-b859-ca31e8ffacc2
+		summarizeBy: none
+		sourceColumn: dia
+
+		annotation SummarizationSetBy = Automatic
+
+	column dia_semana
+		dataType: string
+		lineageTag: 59a71813-34c1-48f8-8861-3376269c174c
+		summarizeBy: none
+		sourceColumn: dia_semana
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_tiempo = m
+		mode: import
+		source =
+				let
+				    Origen = Odbc.DataSource("dsn=maghsa-athena;awsregion=us-east-1;workgroup=maghsa-powerbi", [HierarchicalNavigation=true]),
+				    AwsDataCatalog_Database = Origen{[Name="AwsDataCatalog",Kind="Database"]}[Data],
+				    compras_dwh_Schema = AwsDataCatalog_Database{[Name="compras_dwh",Kind="Schema"]}[Data],
+				    dim_tiempo_Table = compras_dwh_Schema{[Name="dim_tiempo",Kind="Table"]}[Data]
+				in
+				    dim_tiempo_Table
+
+	annotation PBI_ResultType = Table
+

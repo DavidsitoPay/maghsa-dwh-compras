@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "e1a0c3d5f7b94621a8c1",
+  "position": {
+    "x": 24,
+    "y": 8,
+    "z": 0,
+    "height": 100,
+    "width": 1872,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Alternativas de proveedor",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontSize": "24pt",
+                      "color": "#1f3a5f"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "¿Quién más podía surtir cada producto? Principal = proveedor al que más se compró. Alternativa disponible = proveedor vigente autorizado distinto del principal.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#5a6472"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Los inactivos no cuentan. Un producto con un solo proveedor depende de él: es un riesgo, no un error. Histórico completo, sin filtro de fecha.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#5a6472"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

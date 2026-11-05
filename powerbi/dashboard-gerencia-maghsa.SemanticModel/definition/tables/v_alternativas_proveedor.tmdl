@@ -1,0 +1,164 @@
+table v_alternativas_proveedor
+	isHidden
+	lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000030
+
+	column producto_id
+		dataType: string
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000031
+		summarizeBy: none
+		sourceColumn: producto_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column producto
+		dataType: string
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000032
+		summarizeBy: none
+		sourceColumn: producto
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria
+		dataType: string
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000033
+		summarizeBy: none
+		sourceColumn: categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column proveedor
+		dataType: string
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000034
+		summarizeBy: none
+		sourceColumn: proveedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column estado_proveedor
+		dataType: string
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000035
+		summarizeBy: none
+		sourceColumn: estado_proveedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column condicion_pago
+		dataType: string
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000036
+		summarizeBy: none
+		sourceColumn: condicion_pago
+
+		annotation SummarizationSetBy = Automatic
+
+	column situacion_codigo
+		dataType: string
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000003a
+		summarizeBy: none
+		sourceColumn: situacion_codigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column situacion
+		dataType: string
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000003b
+		summarizeBy: none
+		sourceColumn: situacion
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordenes
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000037
+		summarizeBy: none
+		sourceColumn: ordenes
+
+		annotation SummarizationSetBy = Automatic
+
+	column unidades
+		dataType: double
+		formatString: #,##0.##
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000038
+		summarizeBy: none
+		sourceColumn: unidades
+
+		annotation SummarizationSetBy = Automatic
+
+	column gasto
+		dataType: double
+		formatString: "Q"#,##0.00
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000039
+		summarizeBy: none
+		sourceColumn: gasto
+
+		annotation SummarizationSetBy = Automatic
+
+	column precio_promedio
+		dataType: double
+		formatString: "Q"#,##0.00
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000003c
+		summarizeBy: none
+		sourceColumn: precio_promedio
+
+		annotation SummarizationSetBy = Automatic
+
+	column lead_time_promedio_dias
+		dataType: double
+		formatString: 0.0
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000003d
+		summarizeBy: none
+		sourceColumn: lead_time_promedio_dias
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_gasto_producto
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000003e
+		summarizeBy: none
+		sourceColumn: pct_gasto_producto
+
+		annotation SummarizationSetBy = Automatic
+
+	column dif_precio_vs_principal_pct
+		dataType: double
+		formatString: +0.0%;-0.0%;0.0%
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000003f
+		summarizeBy: none
+		sourceColumn: dif_precio_vs_principal_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column dif_lead_time_vs_principal_dias
+		dataType: double
+		formatString: +0.0;-0.0;0.0
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000040
+		summarizeBy: none
+		sourceColumn: dif_lead_time_vs_principal_dias
+
+		annotation SummarizationSetBy = Automatic
+
+	column ultima_compra
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000041
+		summarizeBy: none
+		sourceColumn: ultima_compra
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition v_alternativas_proveedor = m
+		mode: import
+		source =
+				let
+				    Origen = Odbc.DataSource("dsn=maghsa-athena;awsregion=us-east-1;workgroup=maghsa-powerbi", [HierarchicalNavigation=true]),
+				    AwsDataCatalog_Database = Origen{[Name="AwsDataCatalog",Kind="Database"]}[Data],
+				    compras_dwh_Schema = AwsDataCatalog_Database{[Name="compras_dwh",Kind="Schema"]}[Data],
+				    vista = compras_dwh_Schema{[Name="v_alternativas_proveedor"]}[Data]
+				in
+				    vista
+
+	annotation PBI_ResultType = Table
+

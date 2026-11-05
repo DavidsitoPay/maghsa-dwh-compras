@@ -1,0 +1,386 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "e1a0c3d5f7b94621a8c8",
+  "position": {
+    "x": 24,
+    "y": 612,
+    "z": 220,
+    "height": 440,
+    "width": 1872,
+    "tabOrder": 220
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_alternativas_proveedor"
+                    }
+                  },
+                  "Property": "producto"
+                }
+              },
+              "queryRef": "v_alternativas_proveedor.producto",
+              "nativeQueryRef": "producto",
+              "displayName": "Producto"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_alternativas_proveedor"
+                    }
+                  },
+                  "Property": "proveedor"
+                }
+              },
+              "queryRef": "v_alternativas_proveedor.proveedor",
+              "nativeQueryRef": "proveedor",
+              "displayName": "Proveedor"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_alternativas_proveedor"
+                    }
+                  },
+                  "Property": "situacion"
+                }
+              },
+              "queryRef": "v_alternativas_proveedor.situacion",
+              "nativeQueryRef": "situacion",
+              "displayName": "Situación"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "hechos_compras"
+                    }
+                  },
+                  "Property": "Gasto al Proveedor"
+                }
+              },
+              "queryRef": "hechos_compras.Gasto al Proveedor",
+              "nativeQueryRef": "Gasto al Proveedor",
+              "displayName": "Gasto"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "hechos_compras"
+                    }
+                  },
+                  "Property": "Participación en el Gasto del Producto"
+                }
+              },
+              "queryRef": "hechos_compras.Participación en el Gasto del Producto",
+              "nativeQueryRef": "Participación en el Gasto del Producto",
+              "displayName": "% del gasto del producto"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "hechos_compras"
+                    }
+                  },
+                  "Property": "Precio Promedio al Proveedor"
+                }
+              },
+              "queryRef": "hechos_compras.Precio Promedio al Proveedor",
+              "nativeQueryRef": "Precio Promedio al Proveedor",
+              "displayName": "Precio promedio"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "hechos_compras"
+                    }
+                  },
+                  "Property": "Diferencia de Precio vs Proveedor Principal"
+                }
+              },
+              "queryRef": "hechos_compras.Diferencia de Precio vs Proveedor Principal",
+              "nativeQueryRef": "Diferencia de Precio vs Proveedor Principal",
+              "displayName": "Dif. precio vs principal"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "hechos_compras"
+                    }
+                  },
+                  "Property": "Lead Time al Proveedor (días)"
+                }
+              },
+              "queryRef": "hechos_compras.Lead Time al Proveedor (días)",
+              "nativeQueryRef": "Lead Time al Proveedor (días)",
+              "displayName": "Entrega (días)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "hechos_compras"
+                    }
+                  },
+                  "Property": "Diferencia de Lead Time vs Proveedor Principal (días)"
+                }
+              },
+              "queryRef": "hechos_compras.Diferencia de Lead Time vs Proveedor Principal (días)",
+              "nativeQueryRef": "Diferencia de Lead Time vs Proveedor Principal (días)",
+              "displayName": "Dif. entrega vs principal"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "hechos_compras"
+                    }
+                  },
+                  "Property": "Última Compra al Proveedor"
+                }
+              },
+              "queryRef": "hechos_compras.Última Compra al Proveedor",
+              "nativeQueryRef": "Última Compra al Proveedor",
+              "displayName": "Última compra"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "v_alternativas_proveedor"
+                  }
+                },
+                "Property": "producto"
+              }
+            },
+            "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "hechos_compras"
+                  }
+                },
+                "Property": "Gasto al Proveedor"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1F3A5F'"
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#D9DCE1'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "6D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Diferencia vs principal: precio + es más caro; entrega - es más rápida. Principal, hoy inactivo = conviene sustituirlo.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Comparación de proveedores autorizados'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#333333'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
