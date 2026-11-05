@@ -14,8 +14,10 @@ mantenimiento.
 
 ```mermaid
 flowchart LR
+    P[Portal de captura\nformulario web + Lambda] -->|CSV| B
     A[Fuentes de datos\nCSV / hojas de cálculo] -->|carga| B[(Amazon S3\nData Lake)]
-    B --> C[AWS Glue Data Catalog\nCrawlers / tablas]
+    B -->|CTAS desde raw/ con athena/etl| B
+    B --> C[AWS Glue Data Catalog\ntablas de analytics/]
     C --> D[Amazon Athena\nConsultas SQL]
     D --> E[Power BI\nDashboards e indicadores]
 
@@ -31,33 +33,47 @@ Flujo de cuatro capas desacopladas: **almacenamiento (S3) → metadatos (Glue Da
 cómputo/consulta (Athena) → presentación (Power BI)**. Cada capa se puede escalar o reemplazar
 de forma independiente sin afectar al resto de la solución.
 
+Dos entradas escriben en `raw/`: la carga manual de los CSV de origen y el **portal de captura**
+(una página HTML con una Lambda de Function URL), con el que el personal de compras registra
+datos sin acceso a la consola. Las compras capturadas quedan en `raw/compras_web/`. La carga
+oficial a `curated/` y `analytics/` son las sentencias CTAS de Athena de `athena/etl/`
+(orden y recarga en su README).
+
 ## Stack
 
 | Componente | Rol |
 |---|---|
-| Amazon S3 | Almacenamiento de datasets analíticos (Data Lake) |
-| AWS Glue Data Catalog | Repositorio de metadatos: bases, tablas, particiones, crawlers |
-| Amazon Athena | Motor de consultas SQL serverless sobre S3 |
+| Amazon S3 | Almacenamiento de datasets analíticos (Data Lake) y sitio estático del portal |
+| AWS Lambda | Backend del portal de captura: valida y escribe CSV en `raw/` |
+| AWS Glue Data Catalog | Repositorio de metadatos: base `compras_dwh`, tablas y particiones |
+| Amazon Athena | Motor de consultas SQL serverless; ejecuta también la carga (CTAS) |
 | Power BI Desktop | Modelado semántico y dashboards de KPIs |
 | Formatos | CSV (raw) → Parquet (curated/analytics) |
 
 ## Estructura del repositorio
 
 ```
-/modelo-dimensional/   → DDL de hechos y dimensiones (esquema estrella)
-/s3-structure/          → Organización de prefijos/zonas en S3
-/glue/                  → Definición de crawler y tablas del Data Catalog
-/athena/queries/        → Consultas SQL de los KPIs de compras
+/lambda-captura/        → Portal de captura: formulario (index.html) y Lambda (lambda_function.py)
 /sample-data/           → Dataset sintético de prueba (no son datos reales de MAGHSA)
-/docs/                  → Evidencia del avance (capturas, resultados)
+/s3-structure/          → Organización de prefijos/zonas en S3
+/athena/etl/            → Carga oficial: CTAS de raw/ a curated/ y analytics/
+/athena/queries/        → Consultas SQL de los KPIs de compras
+/modelo-dimensional/    → DDL de hechos y dimensiones (esquema estrella)
+/glue/                  → Definición de crawler y tablas del Data Catalog
+/scripts/               → Generador de datos sintéticos
+/powerbi/               → Proyecto PBIP del dashboard de gerencia (modelo semántico e informe)
 ```
 
 ## Modelo dimensional (resumen)
 
 Esquema estrella orientado a análisis de compras:
 
-- **Hechos:** `hechos_compras` — una fila por línea de orden de compra
-- **Dimensiones:** `dim_tiempo`, `dim_proveedor`, `dim_producto`, `dim_categoria`
+- **Hechos:** `hechos_compras` — una fila por línea de orden de compra, particionada por `anio`/`mes`
+- **Dimensiones:** `dim_tiempo`, `dim_proveedor`, `dim_producto`, `dim_categoria`,
+  `dim_unidad_organizacional`, `dim_categoria_proveedor`, `dim_contacto_proveedor` (consulta puntual)
+- **Puentes N:M:** `puente_proveedor_categoria_proveedor`, `puente_proveedor_categoria_producto`,
+  `puente_proveedor_producto`
+- **Regla de negocio:** `categoria_proveedor_x_categoria_producto`
 
 Ver detalle en [`/modelo-dimensional/`](./modelo-dimensional).
 
@@ -73,8 +89,9 @@ transformación complejos y automatización avanzada.
 
 - [x] Problema y requerimientos definidos (documento de tesis)
 - [x] Arquitectura de la solución
-- [x] Modelo dimensional (hechos y dimensiones)
-- [ ] Carga de dataset de prueba en S3
-- [ ] Catalogación en Glue Data Catalog
-- [ ] Consultas de validación en Athena
-- [ ] Dashboards en Power BI
+- [x] Modelo dimensional (hechos, dimensiones y puentes)
+- [x] Datos cargados en S3 (`raw/`, `curated/`, `analytics/`)
+- [x] Catalogación en Glue Data Catalog (base `compras_dwh`)
+- [x] Consultas de los KPIs en Athena (`athena/queries/`)
+- [x] Dashboard en Power BI (5 páginas)
+- [x] Portal de captura desplegado (formulario y Lambda)
