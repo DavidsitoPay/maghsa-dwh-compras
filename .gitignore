@@ -1,0 +1,16 @@
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/editorSettings.json
+
+__pycache__/
+*.pyc
+.pytest_cache/
+*.sqlite
+
+.claude/
+.atl/
+.remember/
+graphify-out/
+CLAUDE.md
+odd/
+docs/
