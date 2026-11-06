@@ -19,6 +19,8 @@ class CatalogoGlue:
     def run_ids_referenciados(self) -> set[str]:
         ids: set[str] = set()
         for tabla in self._paginar(self._glue.get_tables, "TableList", DatabaseName=self._base):
+            if tabla.get("TableType") == "VIRTUAL_VIEW":
+                continue
             ids |= run_ids_en(tabla.get("StorageDescriptor", {}).get("Location", ""))
             particiones = self._paginar(
                 self._glue.get_partitions,

@@ -351,3 +351,22 @@ def test_modo_con_mayusculas_o_espacios_es_invalido(deps_purga, s3, monkeypatch,
     with pytest.raises(CargaError) as excinfo:
         purga.lambda_handler({}, None)
     assert (excinfo.value.codigo, s3.llamadas_delete) == ("PURGA_MODO_INVALIDO", [])
+
+
+def test_vista_sin_particiones_no_aborta_ni_se_consulta(deps_purga, s3, glue, capsys):
+    sembrar_escenario(s3)
+    glue.sembrar_vista("v_compras", f"s3://{BUCKET}/analytics/vistas/v_compras/")
+    resultado = purga.ejecutar_purga("borrar", deps_purga)
+    assert (
+        resultado["estado"],
+        borrados(s3) == {f"analytics/runs/{run(n)}/dim_x/part.parquet" for n in range(1, 7)}
+        | {f"curated/runs/{run(n)}/c.parquet" for n in range(1, 7)},
+        "v_compras" in glue.consultas_particiones,
+    ) == ("borrado", True, False)
+
+
+def test_ubicacion_de_vista_no_protege_runs(deps_purga, s3, glue, capsys):
+    sembrar_escenario(s3)
+    glue.sembrar_vista("v_compras", f"s3://{BUCKET}/analytics/runs/{run(2)}/v_compras/")
+    purga.ejecutar_purga("simulacion", deps_purga)
+    assert ids_a_borrar(capsys) == {run(n) for n in range(1, 7)}

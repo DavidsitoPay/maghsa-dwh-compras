@@ -190,11 +190,17 @@ class FakeGlue:
         self.particiones: dict[str, list[str]] = {}
         self.llamadas: list[str] = []
         self.fallar: dict[str, Exception] = {}
+        self.vistas: set[str] = set()
+        self.consultas_particiones: list[str] = []
 
     def sembrar_legado(self) -> None:
         for tabla in TABLAS_VIVAS:
             self.tablas[tabla] = {"Location": f"s3://{BUCKET}/analytics/{tabla}/", "Parameters": {}}
         self.tablas[HECHOS]["Parameters"] = {"projection.enabled": "true"}
+
+    def sembrar_vista(self, nombre: str, ubicacion: str) -> None:
+        self.tablas[nombre] = {"Location": ubicacion, "Parameters": {}}
+        self.vistas.add(nombre)
 
     def ubicacion(self, tabla: str) -> str:
         return self.tablas[tabla]["Location"]
@@ -229,6 +235,9 @@ class FakeGlue:
 
     def get_partitions(self, DatabaseName, TableName, NextToken=None):
         self._llamar("get_partitions")
+        self.consultas_particiones.append(TableName)
+        if TableName in self.vistas:
+            raise ErrorCliente("InvalidInputException")
         ubicaciones = self.particiones.get(TableName, [])
         inicio = int(NextToken or 0)
         respuesta = {
@@ -242,6 +251,7 @@ class FakeGlue:
         datos = self.tablas[nombre]
         return {
             "Name": nombre,
+            "TableType": "VIRTUAL_VIEW" if nombre in self.vistas else "EXTERNAL_TABLE",
             "StorageDescriptor": {"Location": datos["Location"]},
             "Parameters": dict(datos["Parameters"]),
         }
