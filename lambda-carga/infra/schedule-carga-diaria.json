@@ -1,0 +1,19 @@
+{
+  "Name": "maghsa-carga-diaria",
+  "Description": "Carga diaria del DWH (T8). Creado apagado; lo enciende el usuario.",
+  "State": "DISABLED",
+  "ScheduleExpression": "cron(0 2 * * ? *)",
+  "ScheduleExpressionTimezone": "America/Guatemala",
+  "FlexibleTimeWindow": {
+    "Mode": "OFF"
+  },
+  "Target": {
+    "Arn": "arn:aws:lambda:us-east-1:<account-id>:function:maghsa-carga-etl",
+    "RoleArn": "arn:aws:iam::<account-id>:role/maghsa-scheduler-lambda-role",
+    "Input": "{}",
+    "RetryPolicy": {
+      "MaximumRetryAttempts": 0,
+      "MaximumEventAgeInSeconds": 60
+    }
+  }
+}

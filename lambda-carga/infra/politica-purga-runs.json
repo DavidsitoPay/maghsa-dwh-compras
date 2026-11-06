@@ -1,0 +1,60 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3Lista",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::<bucket-maghsa-dwh>",
+      "Condition": {
+        "StringLike": {
+          "s3:prefix": [
+            "analytics/runs/*",
+            "analytics/runs/",
+            "curated/runs/*",
+            "curated/runs/",
+            "athena-results/etl/*",
+            "athena-results/etl/"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "S3Borrar",
+      "Effect": "Allow",
+      "Action": "s3:DeleteObject",
+      "Resource": [
+        "arn:aws:s3:::<bucket-maghsa-dwh>/analytics/runs/*",
+        "arn:aws:s3:::<bucket-maghsa-dwh>/curated/runs/*"
+      ]
+    },
+    {
+      "Sid": "S3LeerEstado",
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::<bucket-maghsa-dwh>/athena-results/etl/*"
+    },
+    {
+      "Sid": "GlueLectura",
+      "Effect": "Allow",
+      "Action": [
+        "glue:GetTables",
+        "glue:GetPartitions"
+      ],
+      "Resource": [
+        "arn:aws:glue:us-east-1:<account-id>:catalog",
+        "arn:aws:glue:us-east-1:<account-id>:database/compras_dwh",
+        "arn:aws:glue:us-east-1:<account-id>:table/compras_dwh/*"
+      ]
+    },
+    {
+      "Sid": "Logs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:us-east-1:<account-id>:log-group:/aws/lambda/maghsa-purga-runs:*"
+    }
+  ]
+}

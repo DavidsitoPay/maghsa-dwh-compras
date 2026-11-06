@@ -1,0 +1,88 @@
+[
+  {
+    "AlarmName": "maghsa-carga-errores",
+    "AlarmDescription": "La carga diaria fallo (compuerta, rollback o error).",
+    "Namespace": "AWS/Lambda",
+    "MetricName": "Errors",
+    "Dimensions": [
+      {
+        "Name": "FunctionName",
+        "Value": "maghsa-carga-etl"
+      }
+    ],
+    "Statistic": "Sum",
+    "Period": 300,
+    "EvaluationPeriods": 1,
+    "DatapointsToAlarm": 1,
+    "Threshold": 1,
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "TreatMissingData": "notBreaching",
+    "ActionsEnabled": false,
+    "AlarmActions": [
+      "arn:aws:sns:us-east-1:<account-id>:maghsa-dwh-alertas"
+    ]
+  },
+  {
+    "AlarmName": "maghsa-carga-duracion",
+    "AlarmDescription": "La carga supero 8 minutos: evaluar Step Functions.",
+    "Namespace": "AWS/Lambda",
+    "MetricName": "Duration",
+    "Dimensions": [
+      {
+        "Name": "FunctionName",
+        "Value": "maghsa-carga-etl"
+      }
+    ],
+    "Statistic": "Maximum",
+    "Period": 300,
+    "EvaluationPeriods": 1,
+    "DatapointsToAlarm": 1,
+    "Threshold": 480000,
+    "ComparisonOperator": "GreaterThanThreshold",
+    "TreatMissingData": "notBreaching",
+    "ActionsEnabled": false,
+    "AlarmActions": [
+      "arn:aws:sns:us-east-1:<account-id>:maghsa-dwh-alertas"
+    ]
+  },
+  {
+    "AlarmName": "maghsa-carga-sin-corrida",
+    "AlarmDescription": "Sin corrida exitosa en 26 horas (Scheduler apagado, omitida por lock o fallida).",
+    "Namespace": "MAGHSA/CargaDWH",
+    "MetricName": "RunOK",
+    "Statistic": "Sum",
+    "Period": 3600,
+    "EvaluationPeriods": 26,
+    "DatapointsToAlarm": 26,
+    "Threshold": 1,
+    "ComparisonOperator": "LessThanThreshold",
+    "TreatMissingData": "breaching",
+    "ActionsEnabled": false,
+    "AlarmActions": [
+      "arn:aws:sns:us-east-1:<account-id>:maghsa-dwh-alertas"
+    ]
+  },
+  {
+    "AlarmName": "maghsa-purga-errores",
+    "AlarmDescription": "La purga de runs fallo o aborto.",
+    "Namespace": "AWS/Lambda",
+    "MetricName": "Errors",
+    "Dimensions": [
+      {
+        "Name": "FunctionName",
+        "Value": "maghsa-purga-runs"
+      }
+    ],
+    "Statistic": "Sum",
+    "Period": 300,
+    "EvaluationPeriods": 1,
+    "DatapointsToAlarm": 1,
+    "Threshold": 1,
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "TreatMissingData": "notBreaching",
+    "ActionsEnabled": false,
+    "AlarmActions": [
+      "arn:aws:sns:us-east-1:<account-id>:maghsa-dwh-alertas"
+    ]
+  }
+]

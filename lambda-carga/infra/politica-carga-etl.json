@@ -1,0 +1,109 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Athena",
+      "Effect": "Allow",
+      "Action": [
+        "athena:StartQueryExecution",
+        "athena:GetQueryExecution",
+        "athena:GetQueryResults",
+        "athena:StopQueryExecution",
+        "athena:GetWorkGroup"
+      ],
+      "Resource": "arn:aws:athena:us-east-1:<account-id>:workgroup/primary"
+    },
+    {
+      "Sid": "GlueLecturaRepunte",
+      "Effect": "Allow",
+      "Action": [
+        "glue:GetDatabase",
+        "glue:GetTable",
+        "glue:GetTables",
+        "glue:GetPartition",
+        "glue:GetPartitions",
+        "glue:BatchGetPartition",
+        "glue:UpdateTable"
+      ],
+      "Resource": [
+        "arn:aws:glue:us-east-1:<account-id>:catalog",
+        "arn:aws:glue:us-east-1:<account-id>:database/compras_dwh",
+        "arn:aws:glue:us-east-1:<account-id>:table/compras_dwh/*"
+      ]
+    },
+    {
+      "Sid": "GlueEtapa",
+      "Effect": "Allow",
+      "Action": [
+        "glue:CreateTable",
+        "glue:DeleteTable",
+        "glue:BatchCreatePartition"
+      ],
+      "Resource": [
+        "arn:aws:glue:us-east-1:<account-id>:catalog",
+        "arn:aws:glue:us-east-1:<account-id>:database/compras_dwh",
+        "arn:aws:glue:us-east-1:<account-id>:table/compras_dwh/tmp_*",
+        "arn:aws:glue:us-east-1:<account-id>:table/compras_dwh/hechos_compras"
+      ]
+    },
+    {
+      "Sid": "S3Lectura",
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": [
+        "arn:aws:s3:::<bucket-maghsa-dwh>/raw/*",
+        "arn:aws:s3:::<bucket-maghsa-dwh>/analytics/*",
+        "arn:aws:s3:::<bucket-maghsa-dwh>/curated/*",
+        "arn:aws:s3:::<bucket-maghsa-dwh>/athena-results/etl/*"
+      ]
+    },
+    {
+      "Sid": "S3Escritura",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:AbortMultipartUpload"
+      ],
+      "Resource": [
+        "arn:aws:s3:::<bucket-maghsa-dwh>/analytics/runs/*",
+        "arn:aws:s3:::<bucket-maghsa-dwh>/curated/runs/*",
+        "arn:aws:s3:::<bucket-maghsa-dwh>/athena-results/etl/*"
+      ]
+    },
+    {
+      "Sid": "S3Lista",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::<bucket-maghsa-dwh>",
+      "Condition": {
+        "StringLike": {
+          "s3:prefix": [
+            "raw/*",
+            "raw/",
+            "analytics/*",
+            "analytics/",
+            "curated/*",
+            "curated/",
+            "athena-results/etl/*",
+            "athena-results/etl/"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "S3Ubicacion",
+      "Effect": "Allow",
+      "Action": "s3:GetBucketLocation",
+      "Resource": "arn:aws:s3:::<bucket-maghsa-dwh>"
+    },
+    {
+      "Sid": "Logs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:us-east-1:<account-id>:log-group:/aws/lambda/maghsa-carga-etl:*"
+    }
+  ]
+}
