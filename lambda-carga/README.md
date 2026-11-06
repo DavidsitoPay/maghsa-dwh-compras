@@ -35,7 +35,7 @@ Carga diaria del DWH de compras de MAGHSA y purga de sus runs. Dos funciones Pyt
 - Conserva los 14 runs más recientes según los `previos_*`.
 - No borra nada referenciado por Glue, por `ultimo_run.json` (su `run_id` y su `previo_run_id`) ni por las `location_previa` de los previos de las 14 corridas retenidas.
 - Solo considera los prefijos `analytics/runs/<14 dígitos>/` y `curated/runs/<14 dígitos>/`. Nunca toca `managed/`, el legado, `raw/` ni `athena-results/`.
-- Siempre registra `purga_plan` antes de borrar. Con `PURGA_MODO=simulacion` no borra. Tope de 5 000 objetos por ejecución, los más antiguos primero, en lotes de 1 000.
+- Siempre registra `purga_plan` antes de borrar. Modo desplegado `PURGA_MODO=borrar`; con `simulacion` solo registra el plan. Con 14 runs o menos responde `sin_corte` y no borra nada. Salta las vistas `v_*` (VIRTUAL_VIEW) al buscar runs referenciados. Tope de 5 000 objetos por ejecución, los más antiguos primero, en lotes de 1 000. Se ejecuta solo al invocarla (Schedule `DISABLED`).
 
 ## 5. Variables de entorno
 

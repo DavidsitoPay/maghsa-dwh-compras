@@ -1,6 +1,6 @@
 # Carga a Athena (raw -> curated/analytics)
 
-Proceso de carga oficial del DWH. Cada archivo `.sql` contiene sentencias separadas por `;`; se envían de una en una al workgroup `primary` (base `compras_dwh`). `orden.txt` fija el orden de ejecución, un archivo por línea. El runner de `lambda-carga/` lo ejecuta una vez al día.
+Proceso de carga oficial del DWH. Cada archivo `.sql` contiene sentencias separadas por `;`; se envían de una en una al workgroup `primary` (base `compras_dwh`). `orden.txt` fija el orden de ejecución, un archivo por línea. La Lambda `maghsa-carga-etl` (`lambda-carga/`) lo ejecuta. Su Schedule diario existe en `DISABLED`: hasta activarlo, la carga corre solo por invocación manual.
 
 Formato de los archivos: las líneas que empiezan por `--` se ignoran; ninguna línea lleva `--` después de código; no hay `;` dentro de literales. Un `SELECT` solo se admite como compuerta, con la marca `-- GATE: <id> ZERO|ZERO_FORZABLE` encima: devuelve una fila con columnas numéricas que deben valer 0 (las `info_*` solo se registran); `ZERO_FORZABLE` admite omitirse con `{"forzar_g3": true}`.
 
