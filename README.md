@@ -59,7 +59,7 @@ oficial a `curated/` y `analytics/` son las sentencias CTAS de Athena de `athena
 /athena/etl/            → Carga oficial: CTAS de raw/ a curated/ y analytics/
 /athena/queries/        → Consultas SQL de los KPIs de compras
 /modelo-dimensional/    → DDL de hechos y dimensiones (esquema estrella)
-/glue/                  → Definición de crawler y tablas del Data Catalog
+/glue/                  → Glue Data Catalog: base y tablas definidas por DDL
 /scripts/               → Generador de datos sintéticos
 /powerbi/               → Proyecto PBIP del dashboard de gerencia (modelo semántico e informe)
 /PG2-009 – DAVID EDGAR RECINOS GARCÍA.md → Documento de tesis (texto)

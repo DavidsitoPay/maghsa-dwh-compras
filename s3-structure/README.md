@@ -70,15 +70,14 @@ detalle de por qué existen separadas de `dim_proveedor`.
 - **Formato:** `raw/` se mantiene en CSV (formato de origen); `curated/` y `analytics/` migran a
   Parquet + compresión Snappy, más eficiente para consultas columnar en Athena.
 - **Nomenclatura:** prefijos en minúsculas, particiones estilo Hive (`anio=AAAA/mes=MM/`) para que
-  el crawler y `MSCK REPAIR TABLE` las reconozcan automáticamente; la carga oficial ejecuta
+  `MSCK REPAIR TABLE` las reconozca automáticamente; la carga oficial ejecuta
   `MSCK REPAIR TABLE hechos_compras` al terminar.
 - **Ciclo de vida:** la regla `expirar-athena-results-30d` (habilitada) hace expirar a los 30 días
   los objetos bajo `athena-results/`, que guarda los resultados de consultas Athena: subprefijos
   `powerbi/` (workgroup `maghsa-powerbi`), `etl/` y `tables/` (resultados de CTAS/ETL).
   La regla `abortar-multipart-7d` (todo el bucket, sin expiración de objetos) aborta las cargas multiparte incompletas a los 7 días.
   No hay reglas de expiración sobre `raw/`, `curated/` ni `analytics/`; la única regla que alcanza todo el bucket es `abortar-multipart-7d`. Es una cuenta personal de pruebas con
-  objetivo de gasto ~0: no hay nada programado; el crawler `crawler-maghsa-compras-analytics` no
-  tiene schedule y se ejecuta a mano, y no hay triggers de Glue ni reglas de EventBridge o
+  objetivo de gasto ~0: no hay nada programado: no hay triggers de Glue ni reglas de EventBridge o
   EventBridge Scheduler.
 - **Seguridad del bucket de datos:** cifrado SSE-S3 (AES256); versionado deshabilitado.
 
