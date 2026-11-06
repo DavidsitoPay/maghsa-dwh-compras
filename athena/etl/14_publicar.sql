@@ -1,0 +1,11 @@
+ALTER TABLE dim_proveedor SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/dim_proveedor/';
+ALTER TABLE dim_producto SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/dim_producto/';
+ALTER TABLE dim_contacto_proveedor SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/dim_contacto_proveedor/';
+ALTER TABLE puente_proveedor_categoria_proveedor SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/puente_proveedor_categoria_proveedor/';
+ALTER TABLE puente_proveedor_categoria_producto SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/puente_proveedor_categoria_producto/';
+ALTER TABLE puente_proveedor_producto SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/puente_proveedor_producto/';
+ALTER TABLE dim_categoria SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/dim_categoria/';
+ALTER TABLE dim_categoria_proveedor SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/dim_categoria_proveedor/';
+ALTER TABLE dim_unidad_organizacional SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/dim_unidad_organizacional/';
+ALTER TABLE categoria_proveedor_x_categoria_producto SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/categoria_proveedor_x_categoria_producto/';
+ALTER TABLE dim_tiempo SET LOCATION 's3://<bucket-maghsa-dwh>/analytics/runs/<run_id>/dim_tiempo/';

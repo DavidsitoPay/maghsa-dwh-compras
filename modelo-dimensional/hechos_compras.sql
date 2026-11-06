@@ -21,7 +21,13 @@ CREATE EXTERNAL TABLE IF NOT EXISTS compras_dwh.hechos_compras (
 PARTITIONED BY (anio STRING, mes STRING)
 STORED AS PARQUET
 LOCATION 's3://<bucket-maghsa-dwh>/analytics/hechos_compras/'
-TBLPROPERTIES ('parquet.compression'='SNAPPY');
-
--- Después de cargar particiones nuevas, sincronizar el catálogo:
--- MSCK REPAIR TABLE compras_dwh.hechos_compras;
+-- anio 2024-2035 debe coincidir con G2.rango de athena/etl/13_compuertas_publicacion.sql
+TBLPROPERTIES (
+    'parquet.compression'='SNAPPY',
+    'projection.enabled'='true',
+    'projection.anio.type'='integer',
+    'projection.anio.range'='2024,2035',
+    'projection.mes.type'='integer',
+    'projection.mes.range'='1,12',
+    'projection.mes.digits'='2'
+);
