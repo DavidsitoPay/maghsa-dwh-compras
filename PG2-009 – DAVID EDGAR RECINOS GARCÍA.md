@@ -419,7 +419,7 @@ Conforme al paradigma Design Science Research adoptado, el tipo de investigació
 
 ### **3.3.1 Factibilidad económica**
 
-La propuesta prioriza el bajo costo de mantenimiento como un principio de diseño explícito. Al emplear servicios serverless, el costo se alinea al uso real del almacenamiento y de las consultas, evitando el pago de capacidad ociosa característico de soluciones tradicionales. López Saldarriaga (2025) documenta reducciones de costos superiores al 60% al migrar almacenamiento analítico a Amazon S3 en comparación con infraestructura local, lo cual respalda la viabilidad económica de este enfoque. En operación, el costo mensual de la cuenta de AWS es inferior a USD 0.01, con el almacenamiento, las consultas, las funciones Lambda, las alarmas y las notificaciones dentro de los niveles de uso de bajo costo de cada servicio. El costo de la solución permanece así dentro de márgenes mínimos.
+La propuesta prioriza el bajo costo de mantenimiento como un principio de diseño explícito. Al emplear servicios serverless, el costo se alinea al uso real del almacenamiento y de las consultas, evitando el pago de capacidad ociosa característico de soluciones tradicionales. López Saldarriaga (2025) documenta reducciones de costos superiores al 60% al migrar almacenamiento analítico a Amazon S3 en comparación con infraestructura local, lo cual respalda la viabilidad económica de este enfoque. En operación, el costo mensual de la cuenta de AWS es inferior a USD 0.01, con el almacenamiento, las consultas, las funciones Lambda, las alarmas y las notificaciones dentro de los niveles de uso de bajo costo de cada servicio. La Tabla 1 resume los costos por tipo. El costo de la solución permanece así dentro de márgenes mínimos.
 
 ##### **Tabla 1**
 
@@ -440,7 +440,7 @@ La solución es operativamente viable porque se basa en servicios administrados,
 
 ### **3.3.3 Factibilidad tecnológica**
 
-La implementación es tecnológicamente factible porque utiliza servicios administrados de AWS (Amazon S3, AWS Glue Data Catalog, Amazon Athena, AWS Lambda, Amazon EventBridge Scheduler, Amazon CloudWatch, Amazon SNS y AWS IAM) y Power BI Desktop, que se conecta a Athena mediante ODBC. Asimismo, no se requiere aprovisionamiento de servidores propios ni configuración de redes complejas, lo cual reduce significativamente la barrera técnica de implementación. La madurez y documentación disponible para cada uno de los servicios seleccionados respalda la viabilidad tecnológica de la solución (Landa Felices & Lujan Canicela, 2024).
+La implementación es tecnológicamente factible porque utiliza servicios administrados de AWS (Amazon S3, AWS Glue Data Catalog, Amazon Athena, AWS Lambda, Amazon EventBridge Scheduler, Amazon CloudWatch, Amazon SNS y AWS IAM) y Power BI Desktop, que se conecta a Athena mediante ODBC. Asimismo, no se requiere aprovisionamiento de servidores propios ni configuración de redes complejas, lo cual reduce significativamente la barrera técnica de implementación. La madurez y documentación disponible para cada uno de los servicios seleccionados respalda la viabilidad tecnológica de la solución (Landa Felices & Lujan Canicela, 2024). La Tabla 2 detalla la función de cada componente de software en la solución.
 
 ##### **Tabla 2**
 
@@ -657,7 +657,7 @@ La solución opera con los recursos detallados en la Tabla 9. La selección resp
 
 ## **3.8 Cronograma**
 
-El cronograma se organiza en fases semanales que reflejan la secuencia lógica de las actividades definidas en el diseño general. La estructura temporal responde al enfoque incremental adoptado, en el cual cada etapa genera insumos para la siguiente y permite validar avances parciales antes de continuar. Las semanas indicadas son referenciales y pueden ajustarse según la disponibilidad del dataset, el resultado de las pruebas intermedias y los ajustes derivados del proceso iterativo del DSR (Peffers et al., 2007).
+El cronograma se organiza en fases semanales que reflejan la secuencia lógica de las actividades definidas en el diseño general. La estructura temporal responde al enfoque incremental adoptado, en el cual cada etapa genera insumos para la siguiente y permite validar avances parciales antes de continuar. La Tabla 10 presenta las actividades por semana. Las semanas indicadas son referenciales y pueden ajustarse según la disponibilidad del dataset, el resultado de las pruebas intermedias y los ajustes derivados del proceso iterativo del DSR (Peffers et al., 2007).
 
 ##### **Tabla 10**
 
@@ -965,6 +965,10 @@ El diseño cubre los cinco objetivos específicos y el módulo de ingesta valida
 
 **Corrida de carga.** Ejecución completa de la carga diaria, identificada por una marca de tiempo, que escribe sus resultados en prefijos propios de las zonas curated y analytics. Las tablas del catálogo se apuntan a la corrida únicamente después de superar las compuertas de validación.
 
+**CORS (Cross-Origin Resource Sharing).** Mecanismo de los navegadores que define qué sitios pueden invocar un servicio alojado en otro origen. En la solución, la Function URL de la función de captura lo configura para aceptar las solicitudes del formulario web.
+
+**CSV (Comma-Separated Values).** Formato de texto plano en el que cada línea es un registro y los campos se separan por comas. En la solución, es el formato de los datos en la zona raw.
+
 **CTAS (CREATE TABLE AS SELECT).** Sentencia de Athena que crea una tabla a partir del resultado de una consulta y escribe los datos en Amazon S3 en el formato indicado, por ejemplo Parquet. En la solución, realiza la transformación de la zona raw hacia las zonas curated y analytics.
 
 **Dashboard.** Panel de control interactivo que presenta indicadores clave de desempeño (KPIs) y métricas relevantes de forma visual y resumida, con el propósito de facilitar el monitoreo de procesos y la toma de decisiones.
@@ -974,6 +978,8 @@ El diseño cubre los cinco objetivos específicos y el módulo de ingesta valida
 **Data Warehouse (DWH).** Sistema de almacenamiento analítico orientado a consultas e informes, que integra datos de múltiples fuentes bajo un modelo estructurado y optimizado para el análisis histórico y la generación de indicadores de negocio.
 
 **DAX (Data Analysis Expressions).** Lenguaje de fórmulas utilizado en Power BI para crear medidas y columnas calculadas de forma dinámica. Permite construir cálculos como agregaciones, variaciones temporales, acumulados y porcentajes en función del contexto de filtro aplicado por el usuario.
+
+**DDL (Data Definition Language).** Conjunto de sentencias SQL que definen la estructura de los datos, como tablas, columnas y vistas. En la solución, las sentencias DDL registran las tablas y vistas en AWS Glue Data Catalog.
 
 **Design Science Research (DSR).** Paradigma de investigación en Sistemas de Información orientado a la creación y evaluación de artefactos tecnológicos que resuelven problemas organizacionales identificados. Contempla ciclos iterativos de diseño, demostración y evaluación del artefacto.
 
@@ -987,15 +993,19 @@ El diseño cubre los cinco objetivos específicos y el módulo de ingesta valida
 
 **Formato Parquet.** Formato de archivo columnar de código abierto optimizado para consultas analíticas, ya que permite leer únicamente las columnas necesarias y aplica compresión eficiente. Su uso en S3 mejora el rendimiento y reduce el costo de las consultas en Athena.
 
+**Function URL.** Dirección HTTPS dedicada que AWS Lambda asigna a una función para invocarla directamente, sin una capa intermedia de API. En la solución, el formulario web envía sus solicitudes a la Function URL de la función de captura.
+
 **Gobernanza del dato.** Conjunto de políticas, procesos y mecanismos que aseguran que los datos sean confiables, seguros, descubribles y trazables desde su origen hasta su consumo analítico. Incluye la gestión de metadatos, control de acceso, linaje y calidad.
 
 **Hechos (tabla de hechos).** Tabla central en un esquema estrella que almacena las métricas o eventos cuantificables del negocio, como montos de compra, cantidades y fechas, junto con las claves foráneas que la vinculan con las tablas de dimensiones.
 
 **Indicador clave de desempeño (KPI).** Métrica cuantificable utilizada para evaluar el nivel de desempeño de un proceso, área o resultado estratégico en función de objetivos previamente definidos.
 
+**Infraestructura como código (IaC).** Práctica de gestionar y aprovisionar infraestructura tecnológica mediante archivos de configuración legibles por máquina, en lugar de procesos manuales, favoreciendo la reproducibilidad y el control de versiones.
+
 **Ingestión de datos.** Proceso de recopilación y carga de datos desde sus fuentes de origen hacia un repositorio analítico o Data Lake, ya sea de forma manual, programada o automatizada.
 
-**Infraestructura como código (IaC).** Práctica de gestionar y aprovisionar infraestructura tecnológica mediante archivos de configuración legibles por máquina, en lugar de procesos manuales, favoreciendo la reproducibilidad y el control de versiones.
+**JSON (JavaScript Object Notation).** Formato de texto ligero para intercambiar datos estructurados mediante pares de nombre y valor. En la solución, el formulario web y la función de captura intercambian sus mensajes en este formato.
 
 **KPI.** Véase Indicador clave de desempeño.
 
@@ -1011,13 +1021,25 @@ El diseño cubre los cinco objetivos específicos y el módulo de ingesta valida
 
 **ODBC (Open Database Connectivity).** Estándar de conexión a fuentes de datos que permite a una aplicación consultar un motor mediante SQL a través de un controlador. En la solución, Power BI se conecta a Athena mediante ODBC.
 
+**Pareto (análisis de).** Técnica que ordena los elementos por su contribución a un total y la acumula, para identificar los pocos que concentran la mayor parte del efecto. En la solución, se aplica a la concentración del gasto por proveedor.
+
 **Particionamiento.** Técnica de organización de datos en S3 que divide los datasets en subconjuntos lógicos según valores de una o más columnas (por ejemplo, año, mes, proveedor), permitiendo que Athena lea únicamente las particiones relevantes para una consulta y reduciendo el costo de procesamiento.
 
 **Power BI.** Herramienta de Microsoft para inteligencia de negocios que permite conectar, modelar y visualizar datos provenientes de múltiples fuentes mediante dashboards interactivos y medidas DAX. En la solución, es la capa de presentación conectada a Amazon Athena mediante ODBC.
 
+**SQL (Structured Query Language).** Lenguaje estándar para definir, consultar y transformar datos organizados en tablas. En la solución, las consultas de Athena y las sentencias CTAS y DDL se escriben en SQL.
+
+**SSE-S3 (Server-Side Encryption with Amazon S3-managed keys).** Cifrado en reposo en el que Amazon S3 cifra cada objeto al guardarlo y administra las claves por su cuenta. En la solución, protege los datos del bucket del data lake.
+
+**Tabla puente.** Tabla que resuelve una relación de muchos a muchos entre dos entidades mediante pares de claves. En la solución, relaciona proveedores con categorías y con productos.
+
 **Trazabilidad.** Dimensión de calidad de datos que indica la capacidad de rastrear el origen y el historial de transformaciones de un dato, permitiendo reconstruir su procedencia dentro del flujo analítico.
 
+**UML (Unified Modeling Language).** Lenguaje gráfico estándar para representar la estructura y el comportamiento de un sistema mediante diagramas, como los de casos de uso, secuencia y clases.
+
 **Unicidad.** Dimensión de calidad de datos que evalúa que los registros de un conjunto de datos no se encuentren duplicados cuando deben representar entidades únicas, evitando el doble conteo en los indicadores analíticos.
+
+**Vista.** Consulta SQL almacenada en el catálogo que se usa como una tabla, sin guardar datos propios. En la solución, dos vistas del catálogo alimentan los indicadores de proveedor único y de alternativas de proveedor.
 
 **Workgroup (Athena).** Recurso de Athena que separa la ejecución, la ubicación de resultados y los límites de consumo de las consultas. En la solución, un workgroup dedicado a Power BI limita cada consulta a 10 GB escaneados.
 
@@ -1248,7 +1270,7 @@ flowchart TB
 
 ###### *Tablas del esquema dimensional registradas en AWS Glue Data Catalog*
 
-> [Insertar captura: consola de AWS Glue, Data Catalog, Tablas, filtrada por la base de datos compras_dwh, con la lista completa de 12 tablas externas y 2 vistas visibles (columnas Nombre, Base de datos, Ubicación y Tipo de tabla). Perfil: usuario IAM del autor con permisos de lectura de Glue, región us-east-1, sin mostrar el identificador de la cuenta en la barra superior. Acción previa: abrir AWS Glue, Data Catalog, Tablas y seleccionar la base de datos compras_dwh; ampliar la página a 20 filas para que se vean las 14 entradas. Demuestra: que el esquema dimensional está catalogado mediante DDL en Glue (12 tablas, 2 vistas) y no por un rastreador. Enlace: https://us-east-1.console.aws.amazon.com/glue/home?region=us-east-1#/v2/data-catalog/tables]
+> [Insertar captura: consola de AWS Glue, Data Catalog, Tablas, filtrada por la base de datos compras_dwh, con la lista completa de 12 tablas externas y 2 vistas visibles (columnas Nombre, Base de datos, Ubicación y Tipo de tabla). Perfil: usuario IAM del autor con permisos de lectura de Glue, región us-east-1, sin mostrar el identificador de la cuenta en la barra superior. Acción previa: abrir AWS Glue, Data Catalog, Tablas y seleccionar la base de datos compras_dwh; ampliar la página a 20 filas para que se vean las 14 entradas. Demuestra: que el esquema dimensional está catalogado mediante DDL en Glue (12 tablas, 2 vistas). Enlace: https://us-east-1.console.aws.amazon.com/glue/home?region=us-east-1#/v2/data-catalog/tables]
 
 *Nota.* [por completar tras tomar la captura: describir la pantalla mostrada y la fecha. Datos sintéticos.]
 
