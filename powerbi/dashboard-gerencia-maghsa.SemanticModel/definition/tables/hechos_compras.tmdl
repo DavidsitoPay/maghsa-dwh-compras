@@ -316,34 +316,6 @@ table hechos_compras
 		displayFolder: 2 Tendencia
 		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000007
 
-	/// Compras mínimas por tramo para mostrar el %. Mismo valor que min_compras en athena/queries/variacion_mensual_seguimiento_diario.sql.
-	measure 'Umbral Mínimo Compras' = 3
-		formatString: 0
-		displayFolder: 2 Tendencia
-		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000101
-
-	/// Días mínimos del mes en curso para mostrar el %. Mismo valor que min_dias en athena/queries/variacion_mensual_seguimiento_diario.sql.
-	measure 'Umbral Mínimo Días' = 5
-		formatString: 0
-		displayFolder: 2 Tendencia
-		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000102
-
-	measure 'Compras Tramo Mes en Curso' =
-			VAR ini = [Inicio Mes en Curso]
-			RETURN IF(NOT ISBLANK(ini), CALCULATE([Órdenes de Compra], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= ini) + 0)
-		formatString: 0
-		displayFolder: 2 Tendencia
-		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000103
-
-	measure 'Compras Tramo Mes Anterior' =
-			VAR ini = [Inicio Mes en Curso]
-			VAR ant = EDATE(ini, -1)
-			VAR fin = MIN(ant + [Día N] - 1, ini - 1)
-			RETURN IF(NOT ISBLANK(ini), CALCULATE([Órdenes de Compra], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= ant, dim_tiempo[fecha] <= fin) + 0)
-		formatString: 0
-		displayFolder: 2 Tendencia
-		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000104
-
 	measure 'Gasto Último Mes Completo' =
 			VAR ini = [Inicio Mes en Curso]
 			RETURN IF(NOT ISBLANK(ini), CALCULATE([Gasto Total], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= EDATE(ini, -1), dim_tiempo[fecha] < ini))
@@ -451,6 +423,34 @@ table hechos_compras
 		formatString: dd/mm/yyyy
 		displayFolder: 6 Alternativas
 		lineageTag: 5c3e1a70-1b11-4d01-8a01-00000000005a
+
+	/// Compras mínimas por tramo para mostrar el %. Mismo valor que min_compras en athena/queries/variacion_mensual_seguimiento_diario.sql.
+	measure 'Umbral Mínimo Compras' = 3
+		formatString: 0
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000101
+
+	/// Días mínimos del mes en curso para mostrar el %. Mismo valor que min_dias en athena/queries/variacion_mensual_seguimiento_diario.sql.
+	measure 'Umbral Mínimo Días' = 5
+		formatString: 0
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000102
+
+	measure 'Compras Tramo Mes en Curso' =
+			VAR ini = [Inicio Mes en Curso]
+			RETURN IF(NOT ISBLANK(ini), CALCULATE([Órdenes de Compra], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= ini) + 0)
+		formatString: 0
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000103
+
+	measure 'Compras Tramo Mes Anterior' =
+			VAR ini = [Inicio Mes en Curso]
+			VAR ant = EDATE(ini, -1)
+			VAR fin = MIN(ant + [Día N] - 1, ini - 1)
+			RETURN IF(NOT ISBLANK(ini), CALCULATE([Órdenes de Compra], REMOVEFILTERS(dim_tiempo), dim_tiempo[fecha] >= ant, dim_tiempo[fecha] <= fin) + 0)
+		formatString: 0
+		displayFolder: 2 Tendencia
+		lineageTag: 5c3e1a70-1b11-4d01-8a01-000000000104
 
 	column id_compra
 		dataType: string
