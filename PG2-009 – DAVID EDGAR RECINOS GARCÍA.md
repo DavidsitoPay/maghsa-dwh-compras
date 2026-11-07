@@ -137,6 +137,33 @@ Solamente el autor es responsable de los conceptos expresados en el trabajo de t
     - [5.3.2 Infraestructura en AWS](#532-infraestructura-en-aws)
     - [5.3.3 Integraciones](#533-integraciones)
     - [5.3.4 Correspondencia entre objetivos y diseño](#534-correspondencia-entre-objetivos-y-diseño)
+- [Capítulo VI - Presentación del Proyecto y Pruebas](#capítulo-vi---presentación-del-proyecto-y-pruebas)
+  - [6.1 Presentación del proyecto (resumen del código)](#61-presentación-del-proyecto-resumen-del-código)
+    - [6.1.1 Tecnologías, herramientas y componentes](#611-tecnologías-herramientas-y-componentes)
+    - [6.1.2 Módulo de captura web y API de validación](#612-módulo-de-captura-web-y-api-de-validación)
+    - [6.1.3 Carga automática y transformación por Athena](#613-carga-automática-y-transformación-por-athena)
+    - [6.1.4 Modelo dimensional y catálogo de datos](#614-modelo-dimensional-y-catálogo-de-datos)
+    - [6.1.5 Consultas de indicadores](#615-consultas-de-indicadores)
+    - [6.1.6 Modelo semántico de Power BI e integración con Athena](#616-modelo-semántico-de-power-bi-e-integración-con-athena)
+    - [6.1.7 Correspondencia entre el diseño y la implementación](#617-correspondencia-entre-el-diseño-y-la-implementación)
+  - [6.2 Presentación del prototipo (pantallas)](#62-presentación-del-prototipo-pantallas)
+    - [6.2.1 Formulario de captura](#621-formulario-de-captura)
+    - [6.2.2 Catálogo de Glue](#622-catálogo-de-glue)
+    - [6.2.3 Editor de Athena](#623-editor-de-athena)
+    - [6.2.4 Tablero de Power BI](#624-tablero-de-power-bi)
+      - [6.2.4.1 Resumen ejecutivo](#6241-resumen-ejecutivo)
+      - [6.2.4.2 Gasto y categorías](#6242-gasto-y-categorías)
+      - [6.2.4.3 Proveedores](#6243-proveedores)
+      - [6.2.4.4 Desempeño y riesgo](#6244-desempeño-y-riesgo)
+      - [6.2.4.5 Alternativas de proveedor](#6245-alternativas-de-proveedor)
+  - [6.3 Pruebas](#63-pruebas)
+    - [6.3.1 Pruebas automatizadas](#631-pruebas-automatizadas)
+    - [6.3.2 Pruebas de las consultas de indicadores](#632-pruebas-de-las-consultas-de-indicadores)
+    - [6.3.3 Reconciliación de cifras](#633-reconciliación-de-cifras)
+    - [6.3.4 Compuertas de calidad de la carga](#634-compuertas-de-calidad-de-la-carga)
+    - [6.3.5 Hallazgos y comportamientos esperados en los datos](#635-hallazgos-y-comportamientos-esperados-en-los-datos)
+    - [6.3.6 Correcciones y ajustes derivados de las pruebas](#636-correcciones-y-ajustes-derivados-de-las-pruebas)
+    - [6.3.7 Alcance y limitaciones de las pruebas](#637-alcance-y-limitaciones-de-las-pruebas)
 - [Conclusiones](#conclusiones)
 - [Recomendaciones](#recomendaciones)
 - [Glosario](#glosario)
@@ -160,6 +187,11 @@ Solamente el autor es responsable de los conceptos expresados en el trabajo de t
 - [Figura 13 - Diagrama de objetos de la orden de compra OC0001](#figura-13)
 - [Figura 14 - Diagrama de clases del dominio de compras](#figura-14)
 - [Figura 15 - Diagrama de infraestructura de la solución en AWS](#figura-15)
+- [Figura 16 - Página Resumen ejecutivo del tablero de Power BI](#figura-16)
+- [Figura 17 - Página Gasto y categorías del tablero de Power BI](#figura-17)
+- [Figura 18 - Página Proveedores del tablero de Power BI](#figura-18)
+- [Figura 19 - Página Desempeño y riesgo del tablero de Power BI](#figura-19)
+- [Figura 20 - Página Alternativas de proveedor del tablero de Power BI](#figura-20)
 
 **Índice de tablas**
 
@@ -179,6 +211,13 @@ Solamente el autor es responsable de los conceptos expresados en el trabajo de t
 - [Tabla 14 - Entidades del modelo de datos](#tabla-14)
 - [Tabla 15 - Recursos de infraestructura y configuración](#tabla-15)
 - [Tabla 16 - Correspondencia entre objetivos, procesos y elementos de diseño](#tabla-16)
+- [Tabla 17 - Componentes, tecnologías y configuración](#tabla-17)
+- [Tabla 18 - Compuertas de validación de la carga automática](#tabla-18)
+- [Tabla 19 - Pantallas del prototipo, usuario y regla o indicador que responden](#tabla-19)
+- [Tabla 20 - Resultado de las pruebas automatizadas locales](#tabla-20)
+- [Tabla 21 - Resultado de la ejecución de las consultas de indicadores en Athena](#tabla-21)
+- [Tabla 22 - Reconciliación del resumen ejecutivo con la tabla de hechos](#tabla-22)
+- [Tabla 23 - Defectos y ajustes derivados de las pruebas](#tabla-23)
 # **Introducción**
 
 La gestión y el control del proceso de compras dependen, en gran medida, de la disponibilidad de información confiable y oportuna. En la práctica, los datos relacionados con órdenes de compra, proveedores, productos, costos, condiciones de pago y tiempos de entrega suelen generarse en diferentes sistemas transaccionales y en diversos formatos, lo cual dificulta su integración, su trazabilidad y su análisis histórico. Esta dispersión provoca que, con frecuencia, el análisis de compras se realice mediante actividades manuales como extracción de datos, depuración en hojas de cálculo y elaboración de reportes estáticos, incrementando el esfuerzo operativo, el riesgo de inconsistencias y la dificultad para sostener indicadores bajo un mismo criterio.
@@ -915,13 +954,368 @@ La Tabla 16 relaciona los objetivos específicos del apartado 1.4.2, el módulo 
 
 El diseño cubre los cinco objetivos específicos y el módulo de ingesta validada: cada uno cuenta con al menos un proceso y un elemento de diseño asociado.
 
+# **Capítulo VI - Presentación del Proyecto y Pruebas**
+
+## **6.1 Presentación del proyecto (resumen del código)**
+
+El Data Warehouse de compras de MAGHSA se desarrolló como cinco módulos encadenados: captura web con su API de validación, carga automática por Athena, modelo dimensional catalogado en Glue, consultas de indicadores y modelo semántico de Power BI. Todos los componentes son servicios administrados de AWS o herramientas sin servidor dedicado.
+
+### **6.1.1 Tecnologías, herramientas y componentes**
+
+La Tabla 17 resume los componentes implementados y su configuración, observada el 6 de noviembre de 2026 en la región us-east-1.
+
+##### **Tabla 17**
+
+###### *Componentes, tecnologías y configuración*
+
+| Componente | Tecnología o servicio | Configuración |
+| ----- | ----- | ----- |
+| Formulario de captura | Página HTML única con JavaScript, alojada como sitio estático en Amazon S3 | Bucket propio, separado del bucket de datos |
+| API de captura | AWS Lambda (Python 3.12) con Function URL | 256 MB de memoria; tiempo máximo de 15 s; sin autenticación de AWS en la URL; CORS habilitado; dos variables de entorno (código de acceso y nombre del bucket de datos) |
+| Almacenamiento | Amazon S3 | Zonas raw, curated y analytics; cifrado SSE-S3; versionado deshabilitado; política que rechaza conexiones no cifradas; expiración a 30 días de los resultados de consultas |
+| Carga automática | AWS Lambda (Python 3.12) y Amazon Athena | 256 MB; tiempo máximo de 900 s; sin reintentos automáticos de la invocación; sin Function URL |
+| Purga de corridas | AWS Lambda (Python 3.12) | 256 MB; tiempo máximo de 300 s; conserva las 14 corridas más recientes; sin Function URL |
+| Catálogo y consulta | AWS Glue Data Catalog y Amazon Athena | Base de datos con 12 tablas externas en Parquet (compresión SNAPPY) y 2 vistas |
+| Aislamiento de consultas | Grupo de trabajo de Athena | Salida fija en una carpeta propia; configuración forzada; corte de 10 GB escaneados por consulta |
+| Programación y alertas | Amazon EventBridge Scheduler, Amazon CloudWatch y Amazon SNS | 2 programaciones (carga diaria a las 02:00 y purga semanal los domingos a las 03:00, hora de Guatemala) y 4 alarmas con aviso a un tema de SNS |
+| Acceso de Power BI | Controlador ODBC de Amazon Athena y usuario IAM | Usuario de solo lectura con una política gestionada propia |
+| Visualización | Power BI Desktop, proyecto en formato PBIP | Modelo semántico en modo Importar (nivel de compatibilidad 1606), cultura es-GT, 5 páginas |
+
+*Nota.* SSE-S3 = cifrado del lado del servidor con claves administradas por Amazon S3; CORS = intercambio de recursos de origen cruzado; PBIP = formato de proyecto de Power BI basado en carpetas.
+
+### **6.1.2 Módulo de captura web y API de validación**
+
+El formulario es una página única que solicita el código de acceso, permite elegir la entidad y ejecutar las acciones de listar, crear, actualizar y eliminar. Cada solicitud viaja como un objeto JSON mediante HTTPS a la Function URL de la función de captura. El objeto contiene el código de acceso, la entidad, la acción y los datos.
+
+La función de captura gestiona seis entidades editables: proveedores, productos, categorías de producto, categorías de proveedor, unidades organizacionales y compras. Otras cinco entidades, que corresponden a las relaciones entre proveedores, categorías y productos y al contacto del proveedor, son de solo lectura y alimentan las listas de selección del formulario. Crear o actualizar un proveedor es una operación compuesta: una sola llamada escribe la fila base y reemplaza sus relaciones y su contacto.
+
+La función valida cada solicitud antes de escribir. Las comprobaciones se agrupan en cuatro niveles.
+
+**Entrada y acceso.** El cuerpo debe ser un objeto JSON de hasta 100,000 caracteres. El código de acceso se compara en tiempo constante. Si la función no tiene código configurado, ningún código autentica.
+
+**Texto de los maestros.** Los campos obligatorios no pueden estar vacíos ni exceder su longitud máxima, y no pueden contener saltos de línea ni caracteres de control. Los valores que inician con `=`, `@`, `+` o `-` se rechazan como protección contra la inyección de fórmulas en archivos CSV, salvo los teléfonos, que pueden iniciar con `+`.
+
+**Reglas de compra.** El proveedor, el producto, la categoría y la unidad organizacional deben existir. El producto debe estar asociado al proveedor. La cantidad y el precio son decimales mayores que cero. El tiempo de entrega es un entero de 0 a 9999. La fecha es real y no posterior a la fecha actual de Guatemala. La condición de pago es «contado» o un número de días, y se guarda normalizada.
+
+**Integridad al eliminar.** La función responde con conflicto y no borra nada cuando el registro está en uso, por ejemplo un proveedor con compras o una categoría con productos.
+
+Si una validación falla, la función no escribe en S3 y devuelve la lista de errores. Las respuestas siguen el protocolo HTTP: 200 o 201 si la operación se aplica, 400 por validación o entrada inválida, 401 si no hay código configurado, 403 por código inválido, 404 si el identificador no existe, 409 por registro en uso y 500 por error interno, con un mensaje genérico y el detalle solo en el registro de CloudWatch. Las compras capturadas se acumulan en un archivo propio de la zona raw, con identificador correlativo de prefijo OCW, separado del histórico de compras.
+
+El rol de la función solo permite leer y escribir objetos de la zona raw y listar ese prefijo; no puede acceder a las zonas curated y analytics. El código compartido es el único control de acceso del formulario, y la sección 5.3.3 documenta esa limitación del diseño.
+
+### **6.1.3 Carga automática y transformación por Athena**
+
+La carga transforma los archivos de la zona raw en tablas Parquet de las zonas curated y analytics. La función de carga ejecuta sentencias SQL de Athena de tipo CTAS (creación de tabla a partir de una consulta) en un orden fijo. El proceso consta de diez pasos:
+
+1. Crear las tablas de cada entidad en curated y analytics a partir de raw.
+2. Registrar el origen de las compras, que une el histórico por partición con las compras capturadas en la web, y excluir las fechas posteriores a la actual.
+3. Ejecutar la compuerta G1 sobre el origen.
+4. Construir la tabla de hechos, particionada por año y mes.
+5. Construir la dimensión de tiempo, desde la primera compra hasta la fecha actual.
+6. Ejecutar las compuertas de publicación.
+7. Repuntar once tablas vivas a la corrida nueva.
+8. Repuntar la tabla de hechos, según el modo de particiones que tenga activo.
+9. Ejecutar la compuerta G15 sobre las tablas ya publicadas.
+10. Eliminar las tablas temporales.
+
+Cada corrida escribe en carpetas propias identificadas por una marca de tiempo UTC y publica solo si todas las compuertas previas se cumplen. Publicar consiste en repuntar la ubicación de las 12 tablas del catálogo mediante la sentencia ALTER TABLE ... SET LOCATION; ninguna sentencia borra datos de S3. La Tabla 18 describe las siete compuertas.
+
+##### **Tabla 18**
+
+###### *Compuertas de validación de la carga automática*
+
+| Compuerta | Momento | Qué verifica | Si falla |
+| ----- | ----- | ----- | ----- |
+| G1 | Antes de construir los hechos | Identificadores únicos, formato de fecha, partición, importes, tiempo de entrega y claves foráneas del origen | La corrida se detiene; no se publica |
+| G2.fk | Antes de publicar | Que toda compra tenga proveedor, producto, categoría y unidad organizacional existentes | La corrida se detiene; no se publica; admite un reintento |
+| G2.conteo | Antes de publicar | Que los hechos coincidan en número con el origen y con la zona curated, y que no existan identificadores duplicados | La corrida se detiene; no se publica; admite un reintento |
+| G2.tiempo | Antes de publicar | Que cada fecha de compra exista en la dimensión de tiempo | La corrida se detiene; no se publica |
+| G2.rango | Antes de publicar | Que los años estén entre 2024 y 2035 y que no haya más de 200 meses | La corrida se detiene; no se publica |
+| G3 | Antes de publicar | Que el número de filas nuevo esté entre 0.8 y 4 veces el del conjunto vigente | La corrida se detiene, salvo que se invoque con el parámetro que la omite |
+| G15 | Después de publicar | Que los conteos y el monto de las 12 tablas vivas coincidan con los de la corrida | Se revierten las ubicaciones anteriores; el estado de la última corrida válida solo se actualiza con G15 cumplida |
+
+*Nota.* Cada compuerta es una consulta que devuelve una fila de columnas numéricas; la compuerta se cumple cuando todas valen cero. El reintento ocurre una sola vez, ante G2.fk, G2.conteo o un error del sistema de Athena, y solo si quedan al menos 420 s del presupuesto de 840 s de la ejecución.
+
+La función de carga añade mecanismos de control sobre ese flujo. Un bloqueo en S3, con escritura condicional, impide dos corridas simultáneas; la segunda responde «omitida» sin llamar a Athena ni a Glue. Antes de cualquier cambio de ubicación guarda las ubicaciones previas, de modo que un fallo posterior a la publicación revierte en orden inverso. El proceso emite registros JSON y métricas propias en CloudWatch.
+
+La purga conserva las 14 corridas más recientes y no elimina nada que Glue, el estado vigente o las ubicaciones previas de las corridas retenidas referencien. Solo opera sobre las carpetas de corridas y no toca la zona raw ni los resultados de consultas.
+
+La carga diaria se programa a las 02:00 y la purga semanal los domingos a las 03:00, hora de Guatemala, mediante Amazon EventBridge Scheduler. Cuatro alarmas de CloudWatch vigilan los errores, la duración y la ausencia de corridas de la carga, y los errores de la purga, y avisan mediante un tema de Amazon SNS. Las corridas citadas en la sección 6.3 se lanzaron mediante invocación puntual de las funciones. La última concluyó con estado correcto en un intento, con el modo de proyección de particiones y 98 filas en la tabla de hechos.
+
+### **6.1.4 Modelo dimensional y catálogo de datos**
+
+La base de datos analítica es la base `compras_dwh` del catálogo de Glue, consultada mediante Athena. Contiene 12 tablas externas en formato Parquet con compresión SNAPPY y 2 vistas. Su estructura corresponde al esquema estrella del Capítulo V, y la Figura 5 muestra la lista de tablas registradas.
+
+**Hechos.** La tabla de hechos de compras tiene el grano de una línea de orden de compra. Se particiona por año y mes. Contiene las claves de fecha, proveedor, producto, categoría y unidad organizacional, las medidas de cantidad, precio unitario, monto total y tiempo de entrega, y los atributos de moneda y condición de pago.
+
+**Dimensiones.** Siete dimensiones: tiempo, proveedor, producto, categoría, categoría de proveedor, unidad organizacional y contacto de proveedor. Esta última es de consulta puntual y no se agrega.
+
+**Puentes y regla de negocio.** Tres tablas puente resuelven las relaciones muchos a muchos entre proveedores, categorías de proveedor, categorías de producto y productos. Una tabla adicional define qué categorías de producto corresponden a cada categoría de proveedor y filtra las casillas del formulario. Los puentes no se unen a la tabla de hechos sin agrupar, porque duplicarían los montos.
+
+**Vistas.** Una vista cuenta los proveedores vigentes por producto y alimenta el indicador de proveedor único. La otra tiene una fila por proveedor autorizado y producto, con sus compras acumuladas y su diferencia contra el proveedor principal, y alimenta la quinta página del tablero.
+
+La tabla de hechos usa proyección de particiones (año entre 2024 y 2035, mes entre 1 y 12), de modo que Athena resuelve las particiones sin registrarlas en el catálogo. La zona de almacenamiento sigue la organización por capas del marco teórico: raw conserva los CSV de origen, curated los datos depurados y analytics el modelo dimensional publicado por corrida.
+
+Con los datos sintéticos, el 6 de noviembre de 2026 la tabla de hechos contenía 98 registros de compra, con fechas entre el 1 de enero y el 3 de noviembre de 2026, ocho proveedores, once productos, seis categorías y tres unidades organizacionales, por un monto total de Q 1,529,502.30.
+
+### **6.1.5 Consultas de indicadores**
+
+Se desarrollaron 18 consultas SQL sobre el modelo dimensional. Cada una abre con una cabecera que nombra el indicador que calcula. Dieciséis alimentan o validan un indicador del tablero y dos son consultas de catálogo puntual: proveedores vigentes por categoría de producto y por producto, útiles para cotizar. Las consultas del tablero se agrupan por página.
+
+**Resumen ejecutivo.** Resumen de compras, costo por periodo, variación mensual del gasto (último mes completo contra el anterior) y seguimiento diario del mes en curso contra el mismo tramo del mes anterior.
+
+**Gasto y categorías.** Gasto por categoría, por unidad organizacional, matriz unidad por categoría, y gasto, cantidad y precio por producto.
+
+**Proveedores.** Gasto por proveedor, concentración del gasto (Pareto) y gasto por condición de pago.
+
+**Desempeño y riesgo.** Lead time promedio y cumplimiento de entrega por proveedor, productos con proveedor único y compras a proveedores inactivos.
+
+**Alternativas de proveedor.** Alternativas por producto: proveedores vigentes autorizados distintos del principal, cuántos se usaron alguna vez y cuántos nunca.
+
+Las consultas se ejecutan en Athena con el grupo de trabajo aislado. Cada indicador del tablero tiene su consulta equivalente, que sirve para validar el resultado de la medida calculada en Power BI. La Figura 6 muestra la ejecución de la consulta de costo por periodo.
+
+### **6.1.6 Modelo semántico de Power BI e integración con Athena**
+
+Power BI se conecta a Athena mediante ODBC. El origen de datos usa un nombre de origen del sistema, la región us-east-1 y el grupo de trabajo aislado, y se autentica con el usuario IAM de solo lectura del conector. La política de ese usuario permite consultar Athena en el grupo de trabajo indicado, leer el catálogo de la base y la zona analytics, y escribir únicamente en la carpeta de resultados del grupo. Las tablas se cargan en modo Importar: Athena se consulta durante cada actualización y no en cada interacción con el tablero, lo que acota el costo de escaneo.
+
+**Estructura.** El modelo incluye la tabla de hechos, cinco dimensiones (tiempo, proveedor, producto, categoría y unidad organizacional) y las dos vistas, ocultas. Declara seis relaciones; la vista de proveedores vigentes se relaciona uno a uno con la dimensión de producto con filtro bidireccional, y la vista de alternativas no se relaciona con las demás tablas. Excluye las tablas puente, para evitar la duplicación de montos, y las dimensiones de categoría de proveedor y de contacto, que no se exponen en el tablero de gerencia.
+
+**Medidas.** El modelo define las medidas de gasto, órdenes, precio promedio ponderado, lead time, cumplimiento de entrega, concentración de proveedores, proveedor único, alternativas de proveedor y seguimiento mensual.
+
+**Semáforo.** Cinco indicadores usan valores de referencia parametrizados: cumplimiento de entrega (meta de 90 %), lead time promedio (7 días), peso del mayor proveedor (límite de 40 %), productos con proveedor único (límite de 30 %) y compras a proveedores inactivos (cualquier monto se marca en rojo). El cumplimiento de entrega cuenta las órdenes con lead time menor o igual al umbral de 7 días.
+
+**Seguimiento mensual.** El indicador compara el tramo del mes en curso con el mismo tramo del mes anterior y muestra el porcentaje solo si ambos tramos tienen compras suficientes (umbral de 3 compras) y el mes lleva días suficientes (umbral de 5 días). Esos umbrales son supuestos de diseño que no se validaron con MAGHSA.
+
+El informe contiene cinco páginas, descritas en la sección 6.2.
+
+### **6.1.7 Correspondencia entre el diseño y la implementación**
+
+La Tabla 16 de la sección 5.3.4 relaciona cada objetivo con sus elementos de diseño. La implementación materializa esa correspondencia de la manera siguiente.
+
+El modelo dimensional del objetivo específico 1 se implementó como el esquema estrella de la sección 6.1.4: una tabla de hechos, siete dimensiones, tres puentes y una tabla de regla de negocio.
+
+La organización del almacenamiento del objetivo específico 2 se implementó con las zonas raw, curated y analytics de Amazon S3, con carpetas por corrida y una carga automática que publica solo tras superar siete compuertas (sección 6.1.3).
+
+La catalogación del objetivo específico 3 se implementó con 12 tablas externas y 2 vistas en el catálogo de Glue, creadas mediante DDL (sección 6.1.4).
+
+Las visualizaciones del objetivo específico 4 se implementaron como un tablero de cinco páginas conectado a Athena por ODBC (secciones 6.1.6 y 6.2).
+
+La validación del objetivo específico 5 se apoya en las compuertas de la carga, en las 18 consultas de indicadores contrastadas con las medidas de Power BI y en las pruebas de la sección 6.3.
+
+El módulo de ingesta validada se implementó como el formulario y la función de captura con sus reglas de validación (sección 6.1.2). El objetivo general se atiende con servicios administrados sin servidor dedicado y con controles de costo concretos: modo Importar en Power BI, corte de 10 GB por consulta en el grupo de trabajo y expiración de los resultados de consultas a los 30 días.
+
+## **6.2 Presentación del prototipo (pantallas)**
+
+El prototipo comprende tres pantallas de apoyo al desarrollo y operación, y cinco páginas del tablero de gerencia. La Tabla 19 resume el propósito, el usuario y el indicador o regla que responde cada una. Todas las pantallas se muestran con datos sintéticos; el prototipo no se sometió a validación con usuarios de MAGHSA.
+
+##### **Tabla 19**
+
+###### *Pantallas del prototipo, usuario y regla o indicador que responden*
+
+| Pantalla | Figura | Usuario | Regla o indicador que responde |
+| ----- | ----- | ----- | ----- |
+| Formulario de captura | 7 | Personal de compras | Ingesta validada; reglas de validación de compra y de maestros |
+| Consola de Glue | 5 | Administración del catálogo | Catalogación del esquema dimensional |
+| Editor de Athena | 6 | Personal analítico | Costo total de compras por periodo |
+| Resumen ejecutivo | 16 | Personal analítico | Semáforo de cinco indicadores, gasto total y variación mensual |
+| Gasto y categorías | 17 | Personal analítico | Distribución del gasto por categoría, unidad y producto |
+| Proveedores | 18 | Personal analítico | Concentración del gasto, condición de pago y compras a proveedores inactivos |
+| Desempeño y riesgo | 19 | Personal analítico | Lead time, cumplimiento de entrega y dependencia de proveedor único |
+| Alternativas de proveedor | 20 | Personal analítico | Proveedores sustitutos autorizados, su precio y su tiempo de entrega |
+
+*Nota.* El personal de compras y el personal analítico corresponden a los actores de los casos de uso del Capítulo V. El prototipo se presenta con datos sintéticos que reproducen la estructura de las compras de MAGHSA.
+
+### **6.2.1 Formulario de captura**
+
+La Figura 7 presenta el formulario. Su propósito es que el personal de compras registre y consulte maestros y compras sin acceso a la consola de AWS. El usuario ingresa el código de acceso, elige la entidad y trabaja sobre un listado con acciones de listar, crear, actualizar y eliminar. En la entidad de compras, el formulario muestra los campos de proveedor, producto, unidad organizacional, fecha, cantidad, precio y lead time, y asigna un identificador correlativo con prefijo OCW. Toda compra se verifica contra los maestros y las reglas de la sección 6.1.2 antes de escribirse, y los errores se informan al usuario sin escribir datos.
+
+### **6.2.2 Catálogo de Glue**
+
+La Figura 5 presenta la consola de Glue. La pantalla lista las 12 tablas externas y las 2 vistas de la base `compras_dwh`, con su ubicación y su tipo. Demuestra que el esquema dimensional se registró mediante DDL y que las tablas apuntan a la corrida publicada vigente.
+
+### **6.2.3 Editor de Athena**
+
+La Figura 6 presenta el editor de Athena con la consulta de costo total por periodo, ejecutada sobre el grupo de trabajo aislado. El resultado responde al indicador de costo por periodo y muestra el volumen escaneado, que es el insumo para controlar el costo de consulta.
+
+### **6.2.4 Tablero de Power BI**
+
+El tablero tiene cinco páginas, y cada una responde preguntas de gestión distintas. Las páginas 2 a 4 incluyen segmentadores de año, mes, categoría y unidad organizacional. La primera incluye cuatro segmentadores, entre ellos año, mes y categoría. La quinta opera sobre el histórico completo y solo filtra por categoría y producto. Las Figuras 16 a 20 presentan las cinco páginas.
+
+#### **6.2.4.1 Resumen ejecutivo**
+
+La primera página, la Figura 16, es la vista de entrada. Su propósito es indicar en una lectura si las compras están bajo control. Contiene diez tarjetas, un medidor, un gráfico de líneas, un gráfico de columnas y una tabla. El medidor muestra cuántos de los cinco indicadores de semáforo están en verde. Las tarjetas muestran el gasto total, las órdenes de compra, la fecha de los datos, el cumplimiento de entrega (meta de 90 %), el lead time promedio (meta de 7 días), el peso del mayor proveedor (límite de 40 %), los productos con proveedor único (límite de 30 %) y las compras a proveedores inactivos. El gráfico de columnas presenta el gasto mensual en miles de quetzales. El gráfico de líneas compara el gasto acumulado por día del mes en curso con el del mes anterior. La página responde a los indicadores de resumen ejecutivo, costo por periodo y variación mensual.
+
+#### **6.2.4.2 Gasto y categorías**
+
+La segunda página, la Figura 17, responde a quién consume el presupuesto y en qué. Contiene dos gráficos de barras y una tabla. Un gráfico de barras presenta el gasto por categoría de producto, con su porcentaje del total, y el otro el gasto por unidad organizacional. La tabla muestra, por producto, el gasto, la cantidad total y el precio promedio ponderado. La página responde a los indicadores de distribución del gasto por categoría, por unidad organizacional y por producto.
+
+#### **6.2.4.3 Proveedores**
+
+La tercera página, la Figura 18, responde a cuánto depende el gasto de pocos proveedores. Contiene cuatro tarjetas, un gráfico de barras, un gráfico combinado de columnas y línea, y una tabla. Las tarjetas muestran los proveedores con compras, las órdenes de compra, el peso del mayor proveedor (límite de 40 %) y las compras a proveedores inactivos. El gráfico de barras ordena el gasto por proveedor y el gráfico combinado presenta el análisis de Pareto con el porcentaje acumulado. La tabla muestra el gasto por condición de pago. La página responde a los indicadores de gasto por proveedor, concentración del gasto, condición de pago y control de compras a proveedores inactivos.
+
+#### **6.2.4.4 Desempeño y riesgo**
+
+La cuarta página, la Figura 19, responde a si los proveedores entregan a tiempo y qué productos dependen de un solo proveedor. Contiene cuatro tarjetas, un gráfico de barras y dos tablas. Las tarjetas muestran el cumplimiento de entrega (meta de 90 %), el lead time promedio (meta de 7 días), el lead time máximo y los productos con proveedor único (límite de 30 %). El gráfico de barras presenta el lead time promedio por proveedor. Una tabla detalla el cumplimiento de entrega por proveedor y la otra la dependencia de proveedor por producto, con la cantidad de proveedores con compras y de proveedores vigentes (un valor de 1 indica proveedor único). La página responde a los indicadores de lead time, cumplimiento de entrega y riesgo de proveedor único.
+
+#### **6.2.4.5 Alternativas de proveedor**
+
+La quinta página, la Figura 20, responde a qué proveedores podrían sustituir al principal de cada producto. Contiene tres tarjetas, un gráfico de barras y una tabla. Las tarjetas muestran las alternativas disponibles (proveedores vigentes distintos del principal), las que se usaron al menos una vez y las que nunca se utilizaron. El gráfico de barras presenta el monto acumulado comprado a cada proveedor. La tabla compara a los proveedores autorizados por producto: situación, gasto, participación en el gasto del producto, precio promedio, diferencia de precio y de lead time frente al principal, y fecha de la última compra. La página consulta el histórico completo y no responde a los segmentadores de año y mes. Responde al indicador de alternativas de proveedor por producto.
+
+## **6.3 Pruebas**
+
+La evaluación del Data Warehouse de compras se apoya en cinco evidencias: las pruebas automatizadas de los dos módulos de código, la ejecución de las consultas de indicadores en Amazon Athena, la reconciliación de cifras entre capas, las compuertas de calidad de la carga y el registro de las correcciones derivadas de esas pruebas. Todas se obtuvieron en el entorno de desarrollo del autor con el conjunto de datos sintético descrito en la sección 1.6. No se realizó validación con usuarios de MAGHSA ni con el asesor (sección 6.3.7).
+
+### **6.3.1 Pruebas automatizadas**
+
+Las pruebas automatizadas verifican la lógica de la función de captura y de las funciones de carga y de purga. Se ejecutan en un entorno local, con un sustituto del SDK de AWS, sin conexión a la red y sin acceso a ningún servicio de la nube. La Tabla 20 resume el resultado observado el 6 de noviembre de 2026.
+
+##### **Tabla 20**
+
+###### *Resultado de las pruebas automatizadas locales*
+
+| Módulo | Pruebas ejecutadas | Aprobadas | Fallidas | Fallo esperado (xfail) | Omitidas | Tiempo (s) |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| Función de captura | 317 | 317 | 0 | 0 | 0 | 0.48 |
+| Funciones de carga y purga | 209 | 208 | 0 | 1 | 0 | 8.42 |
+| Total | 526 | 525 | 0 | 1 | 0 | 8.90 |
+
+*Nota.* Pruebas ejecutadas con Python 3.14 en un equipo local; las funciones se despliegan con el entorno de ejecución Python 3.12 de AWS Lambda. El tiempo total es la suma de los tiempos de cada módulo.
+
+Las pruebas de la función de captura cubren la validación de entradas y las respuestas de error de la API: las entradas mal formadas producen respuestas 4xx, la comparación del código de acceso se realiza en tiempo constante, cada entidad se valida al crearse o actualizarse, y la eliminación de un registro no rompe las referencias de otras entidades. Las pruebas de carga y purga cubren las compuertas de validación, el ejecutor de sentencias de Athena, el estado persistido en S3, el bloqueo de ejecuciones concurrentes, la observabilidad, el contrato de las sentencias SQL, la orquestación de la corrida y la purga de corridas antiguas.
+
+La prueba marcada como fallo esperado documenta una limitación aceptada: dos invocaciones lanzadas en el mismo segundo comparten el identificador de corrida. El bloqueo de S3 serializa las ejecuciones y una corrida dura varios minutos, de modo que el escenario no produce datos inconsistentes. La prueba permanece registrada para que un cambio futuro del identificador la convierta en prueba aprobada.
+
+Estas pruebas validan la lógica de cada función, no el comportamiento de los servicios de AWS. Esa verificación se presenta en las secciones 6.3.2 a 6.3.4.
+
+### **6.3.2 Pruebas de las consultas de indicadores**
+
+Las 18 consultas de indicadores se ejecutaron el 6 de noviembre de 2026 en el grupo de trabajo de Athena destinado a Power BI, sobre la base de datos del catálogo de compras. Cada consulta se ejecutó sin cambios respecto del texto que alimenta el tablero. La Tabla 21 presenta el estado, el número de filas devueltas, los bytes escaneados, el tiempo de ejecución y un valor observado de cada una.
+
+##### **Tabla 21**
+
+###### *Resultado de la ejecución de las consultas de indicadores en Athena*
+
+| N.º | Indicador | Estado | Filas | Bytes escaneados | Tiempo (ms) | Valor observado |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| 1 | Alternativas de proveedor por producto | Exitoso | 11 | 4,620 | 1,270 | Aceite 15W-40: 1 proveedor disponible, 1 utilizado |
+| 2 | Compras a proveedores inactivos (control) | Exitoso | 1 | 1,587 | 1,298 | PRV006 inactivo: 9 órdenes, 256,869.99 |
+| 3 | Concentración del gasto (Pareto) | Exitoso | 8 | 2,740 | 1,199 | Mayor proveedor 20.37 %; 4 proveedores suman 76.02 % |
+| 4 | Costo total por periodo | Exitoso | 11 | 4,205 | 1,250 | Enero a noviembre de 2026; marzo es el mayor mes, con 278,879.91 |
+| 5 | Cumplimiento de entrega por proveedor | Exitoso | 8 | 3,240 | 1,343 | Umbral de 7 días: 100 % y 35.7 % en los extremos |
+| 6 | Distribución del gasto por categoría | Exitoso | 6 | 2,553 | 1,174 | Materia prima metálica: 38.87 % (594,592.12) |
+| 7 | Gasto por condición de pago | Exitoso | 4 | 3,362 | 1,081 | 30 días: 44.87 % (686,222.30) |
+| 8 | Gasto total por proveedor | Exitoso | 8 | 3,966 | 1,149 | Aceros y Maquinaria, S. A.: 311,554.11 en 14 órdenes |
+| 9 | Gasto por unidad organizacional | Exitoso | 3 | 2,919 | 1,331 | Producción 47.72 %; Mantenimiento 45.21 % |
+| 10 | Matriz de gasto por unidad y categoría | Exitoso | 6 | 3,618 | 1,104 | Mantenimiento y neumáticos agrícolas: 558,703.84 |
+| 11 | Gasto, cantidad y precio por producto | Exitoso | 11 | 7,058 | 1,438 | Llanta 18.4-30: 558,703.84; precio ponderado 4,232.60 |
+| 12 | Lead time promedio por proveedor | Exitoso | 8 | 3,240 | 1,212 | Menor valor: 2.5 días |
+| 13 | Proveedores vigentes por categoría (consulta puntual) | Exitoso | 1 | 866 | 1,032 | Categoría CAT05: 1 proveedor vigente |
+| 14 | Proveedores vigentes por producto (consulta puntual) | Exitoso | 1 | 1,841 | 997 | Producto PROD005: 1 proveedor vigente, con contacto |
+| 15 | Resumen ejecutivo | Exitoso | 1 | 3,429 | 775 | 98 órdenes; gasto 1,529,502.30; ticket promedio 15,607.17; 8 proveedores |
+| 16 | Productos con proveedor único | Exitoso | 5 | 1,444 | 976 | 5 productos con un solo proveedor |
+| 17 | Variación mensual del gasto | Exitoso | 10 | 9,047 | 1,099 | Octubre frente a septiembre: +36.20 % |
+| 18 | Seguimiento diario del mes en curso | Exitoso | 31 | 21,278 | 1,690 | Datos al 3 de noviembre de 2026; variación nula por el umbral de compras |
+
+*Nota.* Datos sintéticos. Los importes están en quetzales. Los indicadores 13 y 14 se ejecutaron con los identificadores de categoría y de producto indicados. Fuente: bytes escaneados y tiempo total de ejecución registrados por Athena.
+
+Las 18 consultas terminaron con estado exitoso. El tiempo de ejecución osciló entre 775 ms y 1,690 ms. El volumen escaneado sumó 81,013 bytes, y el máximo de una sola consulta fue de 21,278 bytes. El grupo de trabajo corta toda consulta que supere 10,737,418,240 bytes (10 GB), límite al que ninguna consulta se acerca con el volumen sintético. Estos tiempos son los únicos datos de rendimiento recolectados: no se realizaron pruebas de carga ni con volúmenes mayores (sección 6.3.7).
+
+### **6.3.3 Reconciliación de cifras**
+
+La reconciliación contrasta la cifra que presenta el resumen ejecutivo con el conteo y la suma que se obtienen directamente de la tabla de hechos de compras. La Tabla 22 muestra el resultado.
+
+##### **Tabla 22**
+
+###### *Reconciliación del resumen ejecutivo con la tabla de hechos*
+
+| Medida | Resumen ejecutivo | Tabla de hechos de compras | Coincide |
+| ----- | ----- | ----- | ----- |
+| Órdenes de compra | 98 | 98 | Sí |
+| Gasto total | 1,529,502.30 | 1,529,502.30 | Sí |
+| Proveedores distintos | 8 | 8 | Sí |
+
+*Nota.* Datos sintéticos. La tabla de hechos cubre las fechas del 1 de enero al 3 de noviembre de 2026. La dimensión de proveedores contiene 8 registros, igual que los proveedores distintos de la tabla de hechos.
+
+Las 98 órdenes se descomponen en 97 del registro histórico y una capturada mediante el formulario web, que aporta 12,012.00 al total. Dos corridas consecutivas de la carga produjeron el mismo conteo y la misma suma.
+
+El indicador de proveedor único aporta un caso adicional de reconciliación entre capas. La consulta correspondiente devuelve 5 productos con un solo proveedor vigente, y la dimensión de productos contiene 11 registros. La proporción de 5 sobre 11 coincide con el 45 % que el tablero de Power BI mostró en la captura de pantalla del 4 de noviembre de 2026.
+
+### **6.3.4 Compuertas de calidad de la carga**
+
+La carga ejecuta las siete compuertas de la Tabla 18 antes y después de publicar una corrida. Si una compuerta de publicación falla, no se modifica ningún dato vigente. Si falla G15, se revierten las ubicaciones anteriores.
+
+Tres corridas de la carga, ejecutadas el 5 y el 6 de noviembre de 2026 mediante invocación puntual, terminaron en estado correcto. Las dos primeras duraron 219 s y 253 s y produjeron el mismo conteo y la misma suma (98 filas, 1,529,502.30). La última, ejecutada tras la corrección n.º 9 de la Tabla 23, requirió un solo intento y registró 98 filas en la tabla de hechos. La purga se verificó con una invocación en modo de simulación: con menos corridas que las 14 que se retienen, el plan resultante no marcó ninguna para borrado y no se eliminó ningún dato.
+
+No se provocó una falla deliberada de compuerta en AWS. El comportamiento ante fallos se verifica con las pruebas automatizadas de la sección 6.3.1.
+
+### **6.3.5 Hallazgos y comportamientos esperados en los datos**
+
+**Control de proveedores inactivos.** El control de compras a proveedores inactivos devolvió una fila: el proveedor PRV006, con estado inactivo en la dimensión de proveedores, registra 9 órdenes por un gasto de 256,869.99. El resultado esperado de este control es un conjunto vacío, por lo que la fila constituye una alerta. El control detectó un caso en el conjunto sintético. La evidencia no distingue si el caso proviene de una decisión de modelado de los datos o de una inconsistencia. El resultado muestra que el control cumple su función de señalar las órdenes asociadas a proveedores inactivos.
+
+**Seguimiento diario del mes en curso.** El indicador de seguimiento diario devolvió 31 filas con datos al 3 de noviembre de 2026 y variación porcentual nula. El comportamiento es el esperado: la variación solo se calcula cuando el tramo equivalente del mes anterior reúne al menos 3 compras, y el tramo del 1 al 3 de octubre registró 0. El indicador evita comparar un mes parcial con una base insuficiente. La variación oficial, que compara el último mes completo con el anterior, sí produjo un valor: +36.20 % de octubre frente a septiembre.
+
+### **6.3.6 Correcciones y ajustes derivados de las pruebas**
+
+Las pruebas y las revisiones de calidad produjeron los defectos y ajustes de la Tabla 23. Cada corrección se verificó con las pruebas automatizadas o con una nueva ejecución en Athena antes de continuar.
+
+##### **Tabla 23**
+
+###### *Defectos y ajustes derivados de las pruebas*
+
+| N.º | Origen del hallazgo | Defecto o ajuste | Corrección |
+| ----- | ----- | ----- | ----- |
+| 1 | Revisión de la función de captura | Las entradas mal formadas producían respuesta 500; el código de acceso se comparaba sin comparación en tiempo constante; las demás entidades no se validaban | Respuestas 4xx ante entradas mal formadas, comparación en tiempo constante, validación al crear y actualizar cada entidad, y eliminación sin romper referencias; 317 pruebas automatizadas |
+| 2 | Revisión independiente de la corrección anterior | Un carácter de sustitución suelto en el texto provocaba respuesta 500 | Rechazo con respuesta 4xx antes del despliegue |
+| 3 | Análisis del formulario web | La carga solo leía el registro histórico, y la primera compra web habría recibido un identificador que chocaba con el histórico | Registro propio de compras web, prefijo de identificador propio y lectura de ambos orígenes en la carga |
+| 4 | Revisión estática de la carga | La generación de secuencias de fechas no tenía tope, la fecha no se normalizaba y se aceptaban valores no numéricos | Tope de la secuencia, fecha en formato ISO y rechazo de valores no numéricos |
+| 5 | Revisión de la dimensión de tiempo | El calendario, la proyección de particiones y la reparación de particiones usaban fechas fijas; la fecha en UTC adelantaba la dimensión de tiempo un día respecto de Guatemala | Calendario dinámico, que llega hasta la fecha de Guatemala |
+| 6 | Reconciliación en Power BI | El indicador de proveedor único no coincidía con su consulta de validación | Vista de proveedores vigentes por producto y medida calculada sobre ella; resultado de 5 productos sobre 11 (45 %) |
+| 7 | Análisis de la variación mensual | La variación comparaba el mes en curso, parcial, con un mes completo | Dos vistas: seguimiento diario del mismo tramo del mes anterior y variación oficial entre meses completos |
+| 8 | Verificación de la carga | Hallazgos sobre permisos de IAM, formato del token de idempotencia de Athena, bloqueo en S3 y métricas | Correcciones aplicadas antes de la primera corrida correcta |
+| 9 | Revisión de código de la purga | La purga consultaba particiones sobre las vistas virtuales del catálogo, que no tienen ubicación de datos | La purga omite las vistas; 208 pruebas aprobadas, redespliegue y nueva carga correcta |
+| 10 | Verificación del despliegue | El valor esperado de la tabla de hechos (99 filas) citaba una orden inexistente | Valor correcto de 98 filas: 97 históricas y una capturada por el formulario web |
+
+*Nota.* Los números 1 y 2 corresponden a la revisión de calidad de la función de captura; los números 3 a 5, a la integración de la carga con el formulario y el calendario; los números 6 y 7, a los indicadores del tablero.
+
+### **6.3.7 Alcance y limitaciones de las pruebas**
+
+Las pruebas descritas tienen cuatro límites que condicionan la interpretación de los resultados.
+
+Primero, los datos son sintéticos: reproducen la estructura de las compras de MAGHSA, pero los valores no describen su comportamiento real (sección 1.6). Por ello, los resultados de las secciones 6.3.2 a 6.3.5 demuestran el funcionamiento del sistema, no las cifras reales de la empresa.
+
+Segundo, no hubo validación con usuarios de MAGHSA ni con el asesor. Las pruebas descritas son técnicas y funcionales, y la correspondencia de los indicadores con las necesidades del personal de compras no se ha contrastado con ellos. Los supuestos de negocio utilizados, como el formato de la condición de pago, la moneda única y el umbral de compras del seguimiento diario, no están validados con la empresa.
+
+Tercero, no se realizaron pruebas de carga ni de estabilidad a largo plazo. Los únicos datos de rendimiento son los tiempos y los bytes escaneados de la Tabla 21, obtenidos con un conjunto de 98 órdenes.
+
+Cuarto, las verificaciones se ejecutaron en el entorno de desarrollo del autor. Las corridas citadas se lanzaron mediante invocación puntual de las funciones, y no se midió el comportamiento a lo largo de varios días de operación continua ni la entrega de una notificación por alarma disparada. La verificación visual de los indicadores en Power BI está documentada para el seguimiento de variación mensual, la variación oficial y el indicador de proveedor único; la revisión visual de los 18 indicadores no se ejecutó en esta etapa.
+
 # **Conclusiones**
 
-[PENDIENTE: contenido no incluido en el documento fuente]
+**Conclusión 1. Objetivo general: construir y evaluar una arquitectura de Data Warehouse serverless en AWS orientada al análisis de compras, basada en S3, Glue Data Catalog y Athena, y presentar indicadores mediante Power BI, priorizando simplicidad operativa y bajo costo de mantenimiento.** El objetivo se cumplió en su alcance funcional con datos sintéticos. La arquitectura se construyó y se evaluó: el catálogo contiene 12 tablas externas y 2 vistas sobre almacenamiento en Amazon S3 por zonas, Athena resolvió las 18 consultas de indicadores con estado exitoso (Tabla 21), la carga publica cada corrida solo tras pasar las compuertas de calidad (Tabla 18) y las pruebas automatizadas aprobaron 525 de 526 casos, con un fallo esperado documentado (Tabla 20). Ningún componente requiere servidores dedicados. Respecto de la simplicidad operativa y el bajo costo, la evidencia es de volumen reducido: las 18 consultas escanearon en conjunto 81,013 bytes frente a un límite de 10 GB por consulta, y el costo mensual estimado a partir de la consola de facturación es inferior a USD 0.01 (Tabla 1). Esa estimación corresponde al volumen sintético y no se contrastó con datos reales.
+
+**Conclusión 2. Objetivo específico 1: definir el modelo dimensional de compras (hechos y dimensiones) para soportar indicadores clave.** El objetivo se cumplió. El modelo comprende una tabla de hechos de compras, siete dimensiones, tres tablas puente y una tabla de regla de negocio, definidas en el diseño del Capítulo V (Tabla 16, objetivo específico 1). El modelo soporta los indicadores: las 18 consultas se ejecutan directamente sobre él y el resumen ejecutivo coincide con la tabla de hechos en órdenes, gasto y proveedores (Tabla 22). La dimensión de tiempo se genera de forma dinámica y la compuerta G2.tiempo exige que toda fecha de hechos exista en ella (Tabla 18).
+
+**Conclusión 3. Objetivo específico 2: organizar el almacenamiento de datos de compras en Amazon S3 con una estructura lógica que facilite su consulta.** El objetivo se cumplió. Los datos se organizan en cuatro zonas del almacenamiento: datos originales, datos depurados, datos analíticos y resultados de consultas. Cada corrida de la carga escribe en una ubicación propia dentro de las zonas depurada y analítica, sin borrar datos vigentes, y el catálogo apunta a la corrida más reciente. Las consultas escanearon pocos bytes (Tabla 21) sobre archivos Parquet particionados por año y mes. La estructura incluye reglas de retención: expiración de 30 días para los resultados de Athena y purga semanal que conserva 14 corridas, verificada en modo de simulación (sección 6.3.4). La eliminación efectiva de corridas antiguas no se observó con volumen suficiente.
+
+**Conclusión 4. Objetivo específico 3: catalogar los datasets de compras en AWS Glue Data Catalog para habilitar descubrimiento y consulta consistente.** El objetivo se cumplió. La base de datos del catálogo registra 12 tablas externas en formato Parquet y 2 vistas virtuales, creadas por sentencias DDL. La consulta es consistente: la compuerta G15 verifica que los conteos y la suma de las 12 tablas vigentes coincidan con los de la corrida antes de darla por válida, y dos corridas consecutivas produjeron resultados idénticos (sección 6.3.4). La revisión de la purga detectó que esta consultaba particiones sobre las vistas virtuales; el defecto se corrigió y se verificó con las pruebas automatizadas y una nueva carga (Tabla 23, n.º 9).
+
+**Conclusión 5. Objetivo específico 4: implementar un conjunto de visualizaciones en Power BI (KPIs y tendencias) a partir de consultas en Athena para apoyar la toma de decisiones.** El objetivo se cumplió parcialmente en cuanto a la evidencia disponible. El modelo semántico de Power BI se alimenta de Athena, cada indicador del tablero tiene su consulta equivalente entre las 18 ejecutadas (Tabla 21) y las cinco páginas del tablero se presentan en las Figuras 16 a 20 (sección 6.2). La verificación visual contra las consultas quedó documentada para tres indicadores: el seguimiento de variación mensual, la variación oficial y el indicador de proveedor único, cuyo 45 % coincide con la proporción de 5 productos sobre 11 (sección 6.3.3). El apoyo a la toma de decisiones no se contrastó con usuarios de MAGHSA (sección 6.3.7).
+
+**Conclusión 6. Objetivo específico 5: validar el funcionamiento del DWH mediante la ejecución de consultas y la visualización correcta de indicadores en Power BI.** El objetivo se cumplió en su dimensión técnica y de consultas, y de forma parcial en la visualización. Las 18 consultas terminaron con estado exitoso, la reconciliación de cifras coincidió en todas las medidas comparadas (Tabla 22), las corridas de la carga verificadas superaron las compuertas y las pruebas automatizadas no registraron fallas (Tabla 20). Las pruebas derivaron 10 correcciones y ajustes (Tabla 23), lo que muestra que la validación detectó defectos reales. El control de proveedores inactivos señaló un caso en los datos sintéticos (sección 6.3.5). La validación no incluyó revisión visual de los 18 indicadores en Power BI ni validación con usuarios, y no abarcó pruebas de carga (sección 6.3.7).
 
 # **Recomendaciones**
 
-[PENDIENTE: contenido no incluido en el documento fuente]
+**Recomendación 1. Objetivo general: construir y evaluar una arquitectura de Data Warehouse serverless en AWS orientada al análisis de compras, priorizando simplicidad operativa y bajo costo de mantenimiento.** Se recomienda medir el costo mensual real de la solución durante al menos tres meses de operación con datos reales, y contrastarlo con el costo de mantener el análisis manual actual. También se recomienda revisar con ese comportamiento los umbrales de las alarmas de duración y de ausencia de corridas, y mantener vigente el responsable que recibe los avisos del tema de notificaciones. Derivada de la conclusión 1.
+
+**Recomendación 2. Objetivo específico 1: definir el modelo dimensional de compras.** Se recomienda revisar el modelo con los datos reales de MAGHSA y acordar con la jefatura de compras y con contabilidad la definición de cada indicador y de sus umbrales: el umbral de 7 días del cumplimiento de entrega, el mínimo de 3 compras del seguimiento diario y el criterio de cierre contable. Todo cambio de entidad o columna debe seguir el orden de contratos entre capas: encabezado del origen, función de captura, definiciones del modelo, consultas y modelo de Power BI. Derivada de la conclusión 2.
+
+**Recomendación 3. Objetivo específico 2: organizar el almacenamiento de datos de compras en Amazon S3.** Se recomienda ajustar la retención con el volumen real. MAGHSA debe revisar tras los primeros meses de operación el número de corridas que conserva la purga (14), el plan de ejecución que la purga registra antes de borrar y la expiración de 30 días de los resultados de Athena. Si la empresa requiere trazabilidad de auditoría, debe evaluar con su área de seguridad el versionado y el registro de acceso del almacenamiento, y estimar su costo antes de activarlos. Derivada de la conclusión 3.
+
+**Recomendación 4. Objetivo específico 3: catalogar los datasets en AWS Glue Data Catalog.** Se recomienda mantener la catalogación por sentencias DDL versionadas y añadir una comprobación periódica, de solo lectura, que compare el esquema registrado en el catálogo con las definiciones del modelo. Además, el rango de la proyección de particiones llega hasta 2035; MAGHSA debe revisarlo y ampliarlo antes de que la fecha de las compras se aproxime a ese límite. Derivada de la conclusión 4.
+
+**Recomendación 5. Objetivo específico 4: implementar visualizaciones en Power BI a partir de consultas en Athena.** Se recomienda configurar en Power BI el refresco programado del modelo después de la hora de la carga diaria, ya que el modelo opera en modo Importar y una carga sin refresco no actualiza el tablero. También se recomienda presentar el tablero a la jefatura de compras y a la gerencia con datos reales, y recoger por escrito qué indicadores usan en sus decisiones, para retirar o añadir visuales según ese uso. Derivada de la conclusión 5.
+
+**Recomendación 6. Objetivo específico 5: validar el funcionamiento del DWH mediante consultas e indicadores.** Se recomienda a MAGHSA ejecutar una validación con el personal de compras y con contabilidad sobre un periodo de datos reales, que incluya la revisión visual de los 18 indicadores contra sus consultas y la revisión del caso de proveedor inactivo que el control señala. También se recomienda incorporar integración continua que ejecute las pruebas automatizadas en cada cambio y repetir la ejecución de las 18 consultas tras cada carga como prueba de humo. Antes de ampliar el uso debe realizarse una prueba de carga con el volumen anual real de órdenes. Derivada de la conclusión 6.
 
 # **Glosario**
 
@@ -1646,3 +2040,43 @@ flowchart LR
 ```
 
 *Nota. Elaboración propia (2026).*
+
+##### **Figura 16**
+
+###### *Página Resumen ejecutivo del tablero de Power BI*
+
+> [Insertar captura: página "Resumen ejecutivo" del informe de Power BI con las tarjetas, el medidor de indicadores en verde, el gráfico de gasto mensual y el gráfico de gasto acumulado del mes en curso contra el mes anterior, sin segmentadores aplicados (todos los años y meses). Perfil: usuario local que abre el proyecto en Power BI Desktop, sin mostrar el nombre del DSN ni credenciales. Acción previa: abrir powerbi/dashboard-gerencia-maghsa.pbip, ejecutar Actualizar y verificar que la tarjeta "Datos hasta" muestre la última fecha de compra cargada. Demuestra: que los indicadores de semáforo y el gasto se calculan sobre los datos del Data Warehouse de compras y que el tablero refleja la variación mensual. Enlace: no aplica (captura de Power BI Desktop)]
+
+*Nota.* [por completar tras tomar la captura: describir la pantalla mostrada y la fecha. Datos sintéticos.]
+
+##### **Figura 17**
+
+###### *Página Gasto y categorías del tablero de Power BI*
+
+> [Insertar captura: página "Gasto y categorías" del informe de Power BI con el gráfico de gasto por categoría de producto, el gráfico de gasto por unidad organizacional y la tabla de gasto y precio promedio por producto, sin segmentadores aplicados. Perfil: usuario local que abre el proyecto en Power BI Desktop, sin credenciales visibles. Acción previa: abrir la página "Gasto y categorías" tras actualizar el modelo y confirmar que ningún segmentador esté filtrando. Demuestra: la distribución del gasto sintético por categoría, por unidad organizacional y por producto. Enlace: no aplica (captura de Power BI Desktop)]
+
+*Nota.* [por completar tras tomar la captura: describir la pantalla mostrada y la fecha. Datos sintéticos.]
+
+##### **Figura 18**
+
+###### *Página Proveedores del tablero de Power BI*
+
+> [Insertar captura: página "Proveedores" del informe de Power BI con las tarjetas, el gráfico de gasto por proveedor, el gráfico de Pareto de concentración del gasto y la tabla de gasto por condición de pago, sin segmentadores aplicados. Perfil: usuario local que abre el proyecto en Power BI Desktop, sin credenciales visibles. Acción previa: abrir la página "Proveedores" tras actualizar el modelo y confirmar que ningún segmentador esté filtrando. Demuestra: la concentración del gasto sintético por proveedor y el control de compras a proveedores no vigentes. Enlace: no aplica (captura de Power BI Desktop)]
+
+*Nota.* [por completar tras tomar la captura: describir la pantalla mostrada y la fecha. Datos sintéticos.]
+
+##### **Figura 19**
+
+###### *Página Desempeño y riesgo del tablero de Power BI*
+
+> [Insertar captura: página "Desempeño y riesgo" del informe de Power BI con las tarjetas de cumplimiento de entrega, lead time y proveedor único, el gráfico de lead time por proveedor y las tablas de cumplimiento por proveedor y de dependencia de proveedor por producto, sin segmentadores aplicados. Perfil: usuario local que abre el proyecto en Power BI Desktop, sin credenciales visibles. Acción previa: abrir la página "Desempeño y riesgo" tras actualizar el modelo y confirmar que ningún segmentador esté filtrando. Demuestra: el desempeño de entrega de los proveedores y los productos con proveedor único en los datos sintéticos. Enlace: no aplica (captura de Power BI Desktop)]
+
+*Nota.* [por completar tras tomar la captura: describir la pantalla mostrada y la fecha. Datos sintéticos.]
+
+##### **Figura 20**
+
+###### *Página Alternativas de proveedor del tablero de Power BI*
+
+> [Insertar captura: página "Alternativas de proveedor" del informe de Power BI con las tarjetas de alternativas disponibles, utilizadas y nunca utilizadas, el gráfico de gasto por proveedor y la tabla de comparación de proveedores autorizados, sin segmentadores aplicados. Perfil: usuario local que abre el proyecto en Power BI Desktop, sin credenciales visibles. Acción previa: abrir la página "Alternativas de proveedor" tras actualizar el modelo; si se desea, seleccionar un producto con proveedor único para mostrar el caso de dependencia. Demuestra: la comparación de precio y tiempo de entrega entre el proveedor principal y sus alternativas autorizadas en los datos sintéticos. Enlace: no aplica (captura de Power BI Desktop)]
+
+*Nota.* [por completar tras tomar la captura: describir la pantalla mostrada y la fecha. Datos sintéticos.]
